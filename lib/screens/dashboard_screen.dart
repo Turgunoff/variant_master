@@ -10,15 +10,6 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Dashboard title
-          Text(
-            'Boshqaruv Paneli',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 24),
-          
           // Top stats cards
           Row(
             children: [
@@ -33,7 +24,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Moderatorlar Soni
               Expanded(
                 child: _StatCard(
@@ -45,7 +36,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Variantlar Toplami
               Expanded(
                 child: _StatCard(
@@ -57,7 +48,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Jami Testlar
               Expanded(
                 child: _StatCard(
@@ -70,9 +61,9 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Middle stats cards
           Row(
             children: [
@@ -87,7 +78,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Tasdiqlangan Testlar
               Expanded(
                 child: _StatCard(
@@ -99,7 +90,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Jami Yo'nalishlar
               Expanded(
                 child: _StatCard(
@@ -111,7 +102,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Jami Fanlar
               Expanded(
                 child: _StatCard(
@@ -124,40 +115,34 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Yo'nalishlar bo'yicha Variantlar section
           Text(
             "Yo'nalishlar bo'yicha Variantlar",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          
+
           // Yo'nalishlar table
-          Expanded(
-            flex: 3,
-            child: _DirectionsTable(),
-          ),
-          
+          Expanded(flex: 3, child: _DirectionsTable()),
+
           const SizedBox(height: 24),
-          
+
           // Fanlar bo'yicha Variantlar section
           Text(
             "Fanlar bo'yicha Variantlar",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          
+
           // Fanlar table
-          Expanded(
-            flex: 2,
-            child: _SubjectsTable(),
-          ),
+          Expanded(flex: 2, child: _SubjectsTable()),
         ],
       ),
     );
@@ -195,11 +180,7 @@ class _StatCard extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 28,
-              ),
+              child: Icon(icon, color: iconColor, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -208,9 +189,9 @@ class _StatCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.black54,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.black54),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -218,8 +199,8 @@ class _StatCard extends StatelessWidget {
                   Text(
                     value,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -334,11 +315,7 @@ class _SubjectsTable extends StatelessWidget {
     );
   }
 
-  DataRow _buildSubjectRow(
-    String name,
-    String variantCount,
-    String status,
-  ) {
+  DataRow _buildSubjectRow(String name, String variantCount, String status) {
     return DataRow(
       cells: [
         DataCell(Text(name)),

@@ -40,7 +40,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
               'Profi University',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            const SizedBox(width: 32),
+            const SizedBox(width: 48),
             // Current page title
             Text(
               AppConstants.navigationItems[_selectedIndex].label,
