@@ -1,14 +1,14 @@
 # Test Boshqaruv Tizimi (Test Management System)
 
-A Flutter desktop application for managing tests, variants, and educational content.
+A Flutter desktop application for managing university entrance tests, variants, and educational content.
 
 ## Overview
 
-This application is designed for educational institutions to manage tests, create variants, and organize educational content. It provides a user-friendly interface for administrators, teachers, and moderators.
+This application is designed for educational institutions to manage tests, create variants, and organize educational content. It provides a user-friendly interface for administrators, moderators, and teachers.
 
 ## Features
 
-- **User Authentication**: Secure login system for different user roles
+- **User Authentication**: Secure login system for different user roles (Admin, Moderator, Teacher)
 - **Dashboard**: Overview of system statistics and activities
 - **Variant Creation**: Tools for creating test variants
 - **Teacher Management**: Add, edit, and manage teacher accounts
@@ -23,6 +23,13 @@ This application is designed for educational institutions to manage tests, creat
 - Built with Flutter for cross-platform desktop support (Windows, macOS, Linux)
 - Uses Material 3 design principles for a modern UI
 - Responsive layout suitable for various screen sizes
+- Clean Architecture with Feature-First approach
+- BLoC pattern for state management
+- Dependency Injection with GetIt and Injectable
+- Networking with Dio
+- Routing with GoRouter
+- Local storage with Shared Preferences and Flutter Secure Storage
+- Data modeling with Freezed and JSON Serializable
 
 ## Getting Started
 
@@ -51,7 +58,13 @@ This application is designed for educational institutions to manage tests, creat
    flutter pub get
    ```
 
-4. Run the application:
+4. Run code generation:
+
+   ```
+   flutter pub run build_runner build --delete-conflicting-outputs
+   ```
+
+5. Run the application:
    ```
    flutter run -d windows  # For Windows
    flutter run -d macos    # For macOS
@@ -60,10 +73,55 @@ This application is designed for educational institutions to manage tests, creat
 
 ## Project Structure
 
-- `lib/screens/` - UI screens for different sections of the application
-- `lib/utils/` - Utility classes and constants
-- `lib/models/` - Data models
-- `lib/services/` - Business logic and services
+```
+lib/
+├── app.dart                  # App entry point
+├── main.dart                 # Main function
+├── core/                     # Core components
+│   ├── di/                   # Dependency injection
+│   ├── error/                # Error handling
+│   ├── network/              # Network utilities
+│   ├── router/               # Routing
+│   ├── storage/              # Local storage
+│   ├── theme/                # App theme
+│   └── utils/                # Utilities
+└── features/                 # Features
+    ├── auth/                 # Authentication feature
+    │   ├── data/             # Data layer
+    │   │   ├── datasources/  # Data sources
+    │   │   ├── models/       # Data models
+    │   │   └── repositories/ # Repository implementations
+    │   ├── domain/           # Domain layer
+    │   │   ├── entities/     # Domain entities
+    │   │   ├── repositories/ # Repository interfaces
+    │   │   └── usecases/     # Use cases
+    │   └── presentation/     # Presentation layer
+    │       ├── bloc/         # BLoC
+    │       ├── pages/        # Pages
+    │       └── widgets/      # Widgets
+    ├── dashboard/            # Dashboard feature
+    ├── teachers/             # Teachers feature
+    ├── moderators/           # Moderators feature
+    ├── tests/                # Tests feature
+    ├── variants/             # Variants feature
+    ├── directions/           # Directions feature
+    ├── subjects/             # Subjects feature
+    └── settings/             # Settings feature
+```
+
+## Testing
+
+Run tests with:
+
+```
+flutter test
+```
+
+For BLoC tests:
+
+```
+flutter test test/features/auth/presentation/bloc/auth_bloc_test.dart
+```
 
 ## License
 

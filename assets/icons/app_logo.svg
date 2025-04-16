@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="512" height="512" rx="60" fill="#2563EB"/>
+  
+  <!-- Book icon -->
+  <path d="M128 128v256h256V128H128zm240 240H144V144h224v224z" fill="white"/>
+  
+  <!-- Test paper -->
+  <rect x="176" y="176" width="160" height="160" fill="white"/>
+  
+  <!-- Test lines -->
+  <rect x="192" y="200" width="128" height="8" fill="#2563EB"/>
+  <rect x="192" y="224" width="128" height="8" fill="#2563EB"/>
+  <rect x="192" y="248" width="128" height="8" fill="#2563EB"/>
+  <rect x="192" y="272" width="128" height="8" fill="#2563EB"/>
+  <rect x="192" y="296" width="80" height="8" fill="#2563EB"/>
+  
+  <!-- Checkmark -->
+  <path d="M352 192l-32 32-16-16-16 16 32 32 48-48-16-16z" fill="#10B981"/>
+</svg>
