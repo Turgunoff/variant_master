@@ -187,23 +187,12 @@ class AppDrawer extends StatelessWidget {
       ]);
     } else if (user.role == UserRole.teacher) {
       menuItems.addAll([
-        _buildMenuItem(
-          context,
-          title: 'Testlar',
-          icon: Icons.quiz,
-          route: '/tests',
-        ),
+        // Teacher faqat dashboard va variant yaratish qismlariga kirishi mumkin
         _buildMenuItem(
           context,
           title: 'Variant yaratish',
           icon: Icons.create,
           route: '/create-variant',
-        ),
-        _buildMenuItem(
-          context,
-          title: 'Sozlamalar',
-          icon: Icons.settings,
-          route: '/settings',
         ),
       ]);
     }

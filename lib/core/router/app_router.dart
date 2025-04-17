@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
+import 'package:variant_master/features/auth/domain/entities/user.dart';
 
 import 'package:variant_master/features/admin/presentation/screens/directions_screen.dart';
 import 'package:variant_master/features/admin/presentation/screens/moderators_screen.dart';
@@ -26,8 +27,10 @@ class AppRouter {
     debugLogDiagnostics: true,
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
     redirect: (context, state) {
-      final isAuthenticated = authBloc.state is AuthAuthenticated;
+      final authState = authBloc.state;
+      final isAuthenticated = authState is AuthAuthenticated;
       final isLoginRoute = state.matchedLocation == '/login';
+      final currentPath = state.matchedLocation;
 
       // If not authenticated and not on login page, redirect to login
       if (!isAuthenticated && !isLoginRoute) {
@@ -37,6 +40,19 @@ class AppRouter {
       // If authenticated and on login page, redirect to dashboard
       if (isAuthenticated && isLoginRoute) {
         return '/dashboard';
+      }
+
+      // Role-based access control for routes
+      if (isAuthenticated) {
+        final user = authState.user;
+
+        // Teacher can only access dashboard and create-variant
+        if (user.role == UserRole.teacher) {
+          final allowedRoutes = ['/dashboard', '/create-variant'];
+          if (!allowedRoutes.contains(currentPath)) {
+            return '/dashboard';
+          }
+        }
       }
 
       // No redirect needed
