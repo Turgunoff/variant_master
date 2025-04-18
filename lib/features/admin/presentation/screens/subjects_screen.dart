@@ -23,23 +23,49 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   late List<Subject> _subjects;
   late List<Subject> _filteredSubjects;
 
+  // Track the next available ID
+  int _nextId = 1;
+
   @override
   void initState() {
     super.initState();
     _subjects = _generateMockSubjects(30); // Generate 30 mock subjects
-    _filteredSubjects = List.from(_subjects);
+    // Filter out deleted subjects for the initial display
+    _filteredSubjects =
+        _subjects.where((subject) => !subject.isDeleted).toList();
+
+    // Apply initial sorting by ID (1,2,3,...)
+    _filteredSubjects
+        .sort((a, b) => int.parse(a.id).compareTo(int.parse(b.id)));
+
+    // Find the highest ID in the mock data and set _nextId accordingly
+    if (_subjects.isNotEmpty) {
+      final highestId = _subjects
+          .map((subject) => int.tryParse(subject.id) ?? 0)
+          .reduce((value, element) => value > element ? value : element);
+      _nextId = highestId + 1;
+    }
   }
 
   void _filterSubjects(String query) {
     setState(() {
+      // First filter out deleted subjects
+      final activeSubjects =
+          _subjects.where((subject) => !subject.isDeleted).toList();
+
       if (query.isEmpty) {
-        _filteredSubjects = List.from(_subjects);
+        _filteredSubjects = List.from(activeSubjects);
       } else {
-        _filteredSubjects = _subjects
+        _filteredSubjects = activeSubjects
             .where((subject) =>
                 subject.name.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
+
+      // Default sorting by ID (1,2,3,...)
+      _filteredSubjects
+          .sort((a, b) => int.parse(a.id).compareTo(int.parse(b.id)));
+
       _currentPage = 0; // Reset to first page when filtering
     });
   }
@@ -93,7 +119,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                           ),
                           ElevatedButton.icon(
                             onPressed: () {
-                              // Add subject logic
+                              _showAddSubjectDialog(context);
                             },
                             icon: const Icon(Icons.add),
                             label: const Text('Qo\'shish'),
@@ -106,40 +132,39 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Search and filter
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Qidirish...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide.none,
-                                ),
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 0),
+                      // Modern search
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 8),
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
                               ),
-                              onChanged: _filterSubjects,
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: 16),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Fan nomini qidirish...',
+                              hintStyle:
+                                  const TextStyle(color: Color(0xFF9CA3AF)),
+                              prefixIcon: const Icon(Icons.search,
+                                  color: Color(0xFF6B7280)),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 16),
                             ),
-                            child: IconButton(
-                              onPressed: () {
-                                // Filter logic
-                              },
-                              icon: const Icon(Icons.filter_list),
-                            ),
+                            style: const TextStyle(fontSize: 15),
+                            onChanged: _filterSubjects,
                           ),
-                        ],
+                        ),
                       ),
                       const SizedBox(height: 24),
 
@@ -340,7 +365,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     children: [
                                                       IconButton(
                                                         onPressed: () {
-                                                          // Edit subject logic
+                                                          _showEditSubjectDialog(
+                                                              context, subject);
                                                         },
                                                         icon: const Icon(
                                                           Icons.edit,
@@ -352,7 +378,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                       ),
                                                       IconButton(
                                                         onPressed: () {
-                                                          // Delete subject logic
+                                                          _showDeleteConfirmationDialog(
+                                                              context, subject);
                                                         },
                                                         icon: const Icon(
                                                           Icons.delete,
@@ -505,6 +532,676 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
     return _filteredSubjects.sublist(_startIndex, _endIndex);
   }
 
+  // Show add subject dialog
+  void _showAddSubjectDialog(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController();
+    final topicsController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing by clicking outside
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              width: 500,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header with gradient background
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primary,
+                          Color.fromARGB(204, 37, 99, 235)
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Fan qo\'shish',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Fan nomi
+                          const Text(
+                            'Fan nomi',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: nameController,
+                            decoration: InputDecoration(
+                              hintText: 'Masalan: Matematika',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                    color: AppColors.primary, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Fan nomini kiriting';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Mavzular
+                          const Text(
+                            'Mavzular (ixtiyoriy)',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Mavzular - vergul bilan ajratilgan
+                          TextFormField(
+                            controller: topicsController,
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Mavzularni vergul bilan ajrating. Masalan: Algebra, Geometriya, Trigonometriya',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                    color: AppColors.primary, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                            maxLines: 3,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Actions
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF9FAFB),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF6B7280),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                          ),
+                          child: const Text('Bekor qilish'),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (formKey.currentState?.validate() ?? false) {
+                              // Parse comma-separated topics
+                              final topics = topicsController.text
+                                  .split(',')
+                                  .map((topic) => topic.trim())
+                                  .where((topic) => topic.isNotEmpty)
+                                  .toList();
+
+                              // Create new subject with the next available ID
+                              final newSubject = Subject(
+                                id: _nextId.toString(),
+                                name: nameController.text.trim(),
+                                testsCount: 0, // New subject has no tests yet
+                                topics: topics,
+                              );
+
+                              // Increment the next ID
+                              _nextId++;
+
+                              // Add to list and update state
+                              // First update the parent state
+                              _subjects.add(newSubject);
+                              _filteredSubjects = List.from(_subjects);
+
+                              // Close dialog and dispose controllers
+                              Navigator.pop(context);
+
+                              // Update UI after dialog is closed
+                              setState(() {});
+
+                              // Show success message after dialog is closed
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        const Icon(Icons.check_circle,
+                                            color: Colors.white),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            '${newSubject.name} fani muvaffaqiyatli qo\'shildi',
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    backgroundColor: Colors.green.shade600,
+                                    duration: const Duration(seconds: 3),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    margin: const EdgeInsets.all(16),
+                                  ),
+                                );
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Saqlash'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Show edit subject dialog
+  void _showEditSubjectDialog(BuildContext context, Subject subject) {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: subject.name);
+    final topicsController =
+        TextEditingController(text: subject.topics.join(', '));
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing by clicking outside
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              width: 500,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header with gradient background
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primary,
+                          Color.fromARGB(204, 37, 99, 235)
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Fanni tahrirlash',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Fan nomi
+                          const Text(
+                            'Fan nomi',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: nameController,
+                            decoration: InputDecoration(
+                              hintText: 'Masalan: Matematika',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                    color: AppColors.primary, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Fan nomini kiriting';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Mavzular
+                          const Text(
+                            'Mavzular (ixtiyoriy)',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Mavzular - vergul bilan ajratilgan
+                          TextFormField(
+                            controller: topicsController,
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Mavzularni vergul bilan ajrating. Masalan: Algebra, Geometriya, Trigonometriya',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                    color: AppColors.primary, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                            maxLines: 3,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Actions
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF9FAFB),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF6B7280),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                          ),
+                          child: const Text('Bekor qilish'),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (formKey.currentState?.validate() ?? false) {
+                              // Parse comma-separated topics
+                              final topics = topicsController.text
+                                  .split(',')
+                                  .map((topic) => topic.trim())
+                                  .where((topic) => topic.isNotEmpty)
+                                  .toList();
+
+                              // Create updated subject (preserve isDeleted flag)
+                              final updatedSubject = Subject(
+                                id: subject.id,
+                                name: nameController.text.trim(),
+                                testsCount: subject.testsCount,
+                                topics: topics,
+                                isDeleted: subject
+                                    .isDeleted, // Preserve the isDeleted flag
+                              );
+
+                              // Close dialog first to avoid context issues
+                              Navigator.pop(context);
+
+                              // Update the parent widget's state
+                              this.setState(() {
+                                // Find and update the subject in the list
+                                final index = _subjects
+                                    .indexWhere((s) => s.id == subject.id);
+                                if (index != -1) {
+                                  _subjects[index] = updatedSubject;
+                                }
+
+                                // Update filtered subjects
+                                _filteredSubjects = _subjects
+                                    .where((s) => !s.isDeleted)
+                                    .toList();
+                              });
+
+                              // Show success message
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: [
+                                        const Icon(Icons.check_circle,
+                                            color: Colors.white),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            '${updatedSubject.name} fani muvaffaqiyatli yangilandi',
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    backgroundColor: Colors.green.shade600,
+                                    duration: const Duration(seconds: 3),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    margin: const EdgeInsets.all(16),
+                                  ),
+                                );
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Saqlash'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Show delete confirmation dialog
+  void _showDeleteConfirmationDialog(BuildContext context, Subject subject) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.red, size: 28),
+            const SizedBox(width: 8),
+            const Text('Fanni o\'chirish'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Siz haqiqatan ham "${subject.name}" fanini o\'chirmoqchimisiz?',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Diqqat: Bu amalni ortga qaytarib bo\'lmaydi.',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF6B7280),
+            ),
+            child: const Text('Bekor qilish'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Mark subject as deleted instead of removing it
+              setState(() {
+                final index = _subjects.indexWhere((s) => s.id == subject.id);
+                if (index != -1) {
+                  // Create a new subject with isDeleted = true
+                  final deletedSubject = Subject(
+                    id: subject.id,
+                    name: subject.name,
+                    testsCount: subject.testsCount,
+                    topics: subject.topics,
+                    isDeleted: true,
+                  );
+
+                  // Replace the subject with the deleted version
+                  _subjects[index] = deletedSubject;
+
+                  // Update filtered subjects to exclude deleted ones
+                  _filteredSubjects =
+                      _subjects.where((s) => !s.isDeleted).toList();
+                }
+              });
+
+              // Close dialog
+              Navigator.pop(context);
+
+              // Show success message
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            '${subject.name} fani muvaffaqiyatli o\'chirildi',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: Colors.red.shade600,
+                    duration: const Duration(seconds: 3),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    margin: const EdgeInsets.all(16),
+                  ),
+                );
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('O\'chirish'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Generate mock subjects
   List<Subject> _generateMockSubjects(int count) {
     final subjects = [
@@ -611,10 +1308,11 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
       }
 
       return Subject(
-        id: '${index + 1}',
+        id: '${index + 1}', // ID is sequential and unique
         name: subjectName,
         testsCount: (index + 1) * 5,
         topics: selectedTopics,
+        isDeleted: false, // All mock subjects are active by default
       );
     });
   }
