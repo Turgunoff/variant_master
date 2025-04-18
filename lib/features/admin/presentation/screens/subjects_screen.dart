@@ -18,18 +18,18 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   // Pagination variables
   int _rowsPerPage = 10;
   int _currentPage = 0;
-  
+
   // Mock data
   late List<Subject> _subjects;
   late List<Subject> _filteredSubjects;
-  
+
   @override
   void initState() {
     super.initState();
     _subjects = _generateMockSubjects(30); // Generate 30 mock subjects
     _filteredSubjects = List.from(_subjects);
   }
-  
+
   void _filterSubjects(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -43,7 +43,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
       _currentPage = 0; // Reset to first page when filtering
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
@@ -120,7 +120,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                 ),
                                 filled: true,
                                 fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 0),
                               ),
                               onChanged: _filterSubjects,
                             ),
@@ -147,12 +148,12 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(13),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                                color: Colors.black.withAlpha(20),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
@@ -160,12 +161,13 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                             children: [
                               // Table header
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 16),
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFF9FAFB),
+                                  color: AppColors.primary,
                                   borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(8),
-                                    topRight: Radius.circular(8),
+                                    topLeft: Radius.circular(12),
+                                    topRight: Radius.circular(12),
                                   ),
                                 ),
                                 child: const Row(
@@ -176,7 +178,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'ID',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1F2937),
+                                          color: Colors.white,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -186,7 +189,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Fan nomi',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1F2937),
+                                          color: Colors.white,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -196,7 +200,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Testlar soni',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1F2937),
+                                          color: Colors.white,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -206,7 +211,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Mavzular',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1F2937),
+                                          color: Colors.white,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -216,7 +222,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Amallar',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1F2937),
+                                          color: Colors.white,
+                                          fontSize: 14,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -228,14 +235,20 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                               // Table content with scrolling
                               Expanded(
                                 child: _filteredSubjects.isEmpty
-                                    ? const Center(child: Text('Ma\'lumot topilmadi'))
+                                    ? const Center(
+                                        child: Text('Ma\'lumot topilmadi'))
                                     : ListView.builder(
-                                        itemCount: _getPaginatedSubjects().length,
+                                        itemCount:
+                                            _getPaginatedSubjects().length,
                                         itemBuilder: (context, index) {
-                                          final subject = _getPaginatedSubjects()[index];
+                                          final subject =
+                                              _getPaginatedSubjects()[index];
                                           return Container(
-                                            decoration: const BoxDecoration(
-                                              border: Border(
+                                            decoration: BoxDecoration(
+                                              color: index % 2 == 0
+                                                  ? Colors.white
+                                                  : const Color(0xFFF9FAFB),
+                                              border: const Border(
                                                 bottom: BorderSide(
                                                   color: Color(0xFFE5E7EB),
                                                   width: 1,
@@ -243,7 +256,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                               ),
                                             ),
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 12),
+                                                horizontal: 16, vertical: 14),
                                             child: Row(
                                               children: [
                                                 Expanded(
@@ -252,6 +265,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     subject.id,
                                                     style: const TextStyle(
                                                       color: Color(0xFF1F2937),
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -261,6 +276,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     subject.name,
                                                     style: const TextStyle(
                                                       color: Color(0xFF1F2937),
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -270,31 +287,45 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     '${subject.testsCount}',
                                                     style: const TextStyle(
                                                       color: Color(0xFF1F2937),
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
                                                 Expanded(
                                                   flex: 3,
                                                   child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
                                                         subject.topics.isEmpty
                                                             ? 'Mavzu qo\'shilmagan'
                                                             : '${subject.topicsCount} ta mavzu',
                                                         style: const TextStyle(
-                                                          color: Color(0xFF1F2937),
-                                                          fontWeight: FontWeight.bold,
+                                                          color:
+                                                              Color(0xFF1F2937),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 13,
                                                         ),
                                                       ),
-                                                      if (subject.topics.isNotEmpty)
+                                                      if (subject
+                                                          .topics.isNotEmpty)
                                                         Text(
-                                                          subject.topics.join(', '),
-                                                          style: const TextStyle(
-                                                            color: Color(0xFF6B7280),
+                                                          subject.topics
+                                                              .join(', '),
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Color(
+                                                                0xFF6B7280),
                                                             fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w400,
                                                           ),
-                                                          overflow: TextOverflow.ellipsis,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           maxLines: 1,
                                                         ),
                                                     ],
@@ -303,7 +334,9 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                 Expanded(
                                                   flex: 1,
                                                   child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       IconButton(
                                                         onPressed: () {
@@ -311,7 +344,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                         },
                                                         icon: const Icon(
                                                           Icons.edit,
-                                                          color: AppColors.primary,
+                                                          color:
+                                                              AppColors.primary,
                                                           size: 20,
                                                         ),
                                                         tooltip: 'Tahrirlash',
@@ -339,20 +373,29 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
 
                               // Pagination footer
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFF9FAFB),
+                                  color: Color(0xFFF3F4F6),
                                   borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(8),
-                                    bottomRight: Radius.circular(8),
+                                    bottomLeft: Radius.circular(12),
+                                    bottomRight: Radius.circular(12),
+                                  ),
+                                  border: Border(
+                                    top: BorderSide(
+                                      color: Color(0xFFE5E7EB),
+                                      width: 1,
+                                    ),
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       '${_startIndex + 1}-$_endIndex / ${_filteredSubjects.length}',
-                                      style: const TextStyle(color: Color(0xFF6B7280)),
+                                      style: const TextStyle(
+                                          color: Color(0xFF6B7280)),
                                     ),
                                     Row(
                                       children: [
@@ -361,13 +404,15 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                           children: [
                                             const Text(
                                               'Qatorlar: ',
-                                              style: TextStyle(color: Color(0xFF6B7280)),
+                                              style: TextStyle(
+                                                  color: Color(0xFF6B7280)),
                                             ),
                                             DropdownButton<int>(
                                               value: _rowsPerPage,
                                               underline: Container(),
                                               items: [5, 10, 20, 50]
-                                                  .map((count) => DropdownMenuItem<int>(
+                                                  .map((count) =>
+                                                      DropdownMenuItem<int>(
                                                         value: count,
                                                         child: Text('$count'),
                                                       ))
@@ -376,7 +421,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                 if (value != null) {
                                                   setState(() {
                                                     _rowsPerPage = value;
-                                                    _currentPage = 0; // Reset to first page
+                                                    _currentPage =
+                                                        0; // Reset to first page
                                                   });
                                                 }
                                               },
@@ -388,7 +434,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         IconButton(
                                           icon: const Icon(Icons.first_page),
                                           onPressed: _currentPage > 0
-                                              ? () => setState(() => _currentPage = 0)
+                                              ? () => setState(
+                                                  () => _currentPage = 0)
                                               : null,
                                           color: _currentPage > 0
                                               ? AppColors.primary
@@ -397,7 +444,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         IconButton(
                                           icon: const Icon(Icons.chevron_left),
                                           onPressed: _currentPage > 0
-                                              ? () => setState(() => _currentPage--)
+                                              ? () =>
+                                                  setState(() => _currentPage--)
                                               : null,
                                           color: _currentPage > 0
                                               ? AppColors.primary
@@ -406,7 +454,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         IconButton(
                                           icon: const Icon(Icons.chevron_right),
                                           onPressed: _hasNextPage
-                                              ? () => setState(() => _currentPage++)
+                                              ? () =>
+                                                  setState(() => _currentPage++)
                                               : null,
                                           color: _hasNextPage
                                               ? AppColors.primary
@@ -415,7 +464,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         IconButton(
                                           icon: const Icon(Icons.last_page),
                                           onPressed: _hasNextPage
-                                              ? () => setState(() => _currentPage = _maxPage)
+                                              ? () => setState(
+                                                  () => _currentPage = _maxPage)
                                               : null,
                                           color: _hasNextPage
                                               ? AppColors.primary
@@ -448,13 +498,13 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
       : _startIndex + _rowsPerPage;
   bool get _hasNextPage => _endIndex < _filteredSubjects.length;
   int get _maxPage => (_filteredSubjects.length / _rowsPerPage).ceil() - 1;
-  
+
   // Get paginated subjects
   List<Subject> _getPaginatedSubjects() {
     if (_filteredSubjects.isEmpty) return [];
     return _filteredSubjects.sublist(_startIndex, _endIndex);
   }
-  
+
   // Generate mock subjects
   List<Subject> _generateMockSubjects(int count) {
     final subjects = [
@@ -469,27 +519,87 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
       'Adabiyot',
       'Ona tili',
     ];
-    
+
     final allTopics = {
-      'Matematika': ['Algebra', 'Trigonometriya', 'Geometriya', 'Funksiyalar', 'Statistika'],
-      'Fizika': ['Mexanika', 'Elektr', 'Optika', 'Termodinamika', 'Kvant fizikasi'],
-      'Ingliz tili': ['Grammar', 'Vocabulary', 'Reading', 'Listening', 'Speaking'],
-      'Informatika': ['Algoritm', 'Dasturlash', 'Ma\'lumotlar bazasi', 'Tarmoqlar', 'Web dasturlash'],
-      'Kimyo': ['Organik kimyo', 'Anorganik kimyo', 'Polimerlar', 'Analitik kimyo', 'Biokimyo'],
-      'Biologiya': ['Botanika', 'Zoologiya', 'Anatomiya', 'Genetika', 'Ekologiya'],
-      'Tarix': ['Qadimgi dunyo', 'O\'rta asrlar', 'Yangi davr', 'Eng yangi davr', 'Mahalliy tarix'],
-      'Geografiya': ['Tabiiy geografiya', 'Iqtisodiy geografiya', 'Demografiya', 'Kartografiya', 'Ekologiya'],
-      'Adabiyot': ['Mumtoz adabiyot', 'Zamonaviy adabiyot', 'Jahon adabiyoti', 'She\'riyat', 'Nasr'],
-      'Ona tili': ['Fonetika', 'Leksikologiya', 'Morfologiya', 'Sintaksis', 'Uslubiyat'],
+      'Matematika': [
+        'Algebra',
+        'Trigonometriya',
+        'Geometriya',
+        'Funksiyalar',
+        'Statistika'
+      ],
+      'Fizika': [
+        'Mexanika',
+        'Elektr',
+        'Optika',
+        'Termodinamika',
+        'Kvant fizikasi'
+      ],
+      'Ingliz tili': [
+        'Grammar',
+        'Vocabulary',
+        'Reading',
+        'Listening',
+        'Speaking'
+      ],
+      'Informatika': [
+        'Algoritm',
+        'Dasturlash',
+        'Ma\'lumotlar bazasi',
+        'Tarmoqlar',
+        'Web dasturlash'
+      ],
+      'Kimyo': [
+        'Organik kimyo',
+        'Anorganik kimyo',
+        'Polimerlar',
+        'Analitik kimyo',
+        'Biokimyo'
+      ],
+      'Biologiya': [
+        'Botanika',
+        'Zoologiya',
+        'Anatomiya',
+        'Genetika',
+        'Ekologiya'
+      ],
+      'Tarix': [
+        'Qadimgi dunyo',
+        'O\'rta asrlar',
+        'Yangi davr',
+        'Eng yangi davr',
+        'Mahalliy tarix'
+      ],
+      'Geografiya': [
+        'Tabiiy geografiya',
+        'Iqtisodiy geografiya',
+        'Demografiya',
+        'Kartografiya',
+        'Ekologiya'
+      ],
+      'Adabiyot': [
+        'Mumtoz adabiyot',
+        'Zamonaviy adabiyot',
+        'Jahon adabiyoti',
+        'She\'riyat',
+        'Nasr'
+      ],
+      'Ona tili': [
+        'Fonetika',
+        'Leksikologiya',
+        'Morfologiya',
+        'Sintaksis',
+        'Uslubiyat'
+      ],
     };
-    
+
     return List.generate(count, (index) {
       final subjectName = subjects[index % subjects.length];
       final subjectTopics = allTopics[subjectName] ?? [];
-      
+
       // Generate different numbers of topics for variety
       List<String> selectedTopics = [];
-      
+
       // Some subjects will have 0 topics
       if (index % 7 == 0) {
         // No topics
@@ -499,7 +609,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
         final topicsCount = (index % 3) + 1;
         selectedTopics = subjectTopics.take(topicsCount).toList();
       }
-      
+
       return Subject(
         id: '${index + 1}',
         name: subjectName,
