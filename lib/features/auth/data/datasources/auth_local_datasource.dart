@@ -55,10 +55,7 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
 
   @override
   Future<UserModel?> getLastLoggedInUser() async {
-    final jsonString = sharedPreferences.getString(cachedUserKey);
-    if (jsonString != null) {
-      return UserModel.fromJson(json.decode(jsonString));
-    }
+    // Always return null to force login on app start
     return null;
   }
 
@@ -95,8 +92,8 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
         throw Exception('Parol kiritilmagan');
       }
 
-      // Cache user
-      await cacheUser(user);
+      // Don't cache user to prevent login persistence
+      // await cacheUser(user);
 
       return user;
     } catch (e) {
