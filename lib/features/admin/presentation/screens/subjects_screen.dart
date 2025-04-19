@@ -171,7 +171,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            // color: Colors.red,
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
@@ -250,7 +250,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                   ],
                                 ),
                               ),
-
+                              const SizedBox(height: 8),
                               // Table content with scrolling
                               Expanded(
                                 child: _filteredSubjects.isEmpty

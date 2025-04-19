@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import 'package:variant_master/core/theme/app_colors.dart';
 import 'package:variant_master/features/auth/bloc/auth_bloc.dart';
@@ -8,7 +7,6 @@ import 'package:variant_master/features/auth/domain/entities/user.dart';
 import 'package:variant_master/features/admin/presentation/widgets/app_drawer.dart';
 import 'package:variant_master/features/admin/domain/entities/direction.dart';
 import 'package:variant_master/features/admin/presentation/widgets/direction_dialogs.dart';
-import 'package:variant_master/features/admin/presentation/widgets/directions_table.dart';
 
 class DirectionsScreen extends StatefulWidget {
   const DirectionsScreen({super.key});
@@ -24,6 +22,8 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
 
   // Track the next available ID
   int _nextId = 1;
+
+  // Pagination variables will be implemented later
 
   @override
   void initState() {
@@ -83,16 +83,34 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
       'Veb-texnologiyalar',
     ];
 
+    // Define subjects for each direction
+    final directionSubjects = {
+      'Axborot tizimlari': ['Matematika', 'Fizika', 'Informatika'],
+      'Dasturiy injiniring': ['Matematika', 'Fizika', 'Dasturlash'],
+      'Kompyuter injiniringi': ['Matematika', 'Fizika', 'Elektronika'],
+      'Sun\'iy intellekt': ['Matematika', 'Statistika', 'Machine Learning'],
+      'Telekommunikatsiya': ['Fizika', 'Elektronika', 'Tarmoqlar'],
+      'Kiberxavfsizlik': ['Kriptografiya', 'Tarmoqlar', 'Dasturlash'],
+      'Raqamli iqtisodiyot': ['Iqtisod', 'Statistika', 'Moliya'],
+      'Elektron tijorat': ['Marketing', 'Iqtisod', 'Veb-dasturlash'],
+      'Mobil ilovalar': ['Dasturlash', 'UX/UI Dizayn', 'Mobil texnologiyalar'],
+      'Veb-texnologiyalar': [
+        'HTML/CSS',
+        'JavaScript',
+        'Backend texnologiyalar'
+      ],
+    };
+
     return List.generate(count, (index) {
       final name = directionNames[index % directionNames.length];
       final code = '${10000 + index * 123}';
-      final createdDate = '01.01.202${(index % 3) + 1}';
+      final subjects = directionSubjects[name] ?? [];
 
       return Direction(
         id: '${index + 1}',
         name: name,
         code: code,
-        createdDate: createdDate,
+        subjects: subjects,
         isDeleted: false,
       );
     });
@@ -112,7 +130,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
               id: _nextId.toString(),
               name: newDirection.name,
               code: newDirection.code,
-              createdDate: newDirection.createdDate,
+              subjects: newDirection.subjects,
             );
 
             _directions.add(direction);
@@ -222,7 +240,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                 id: direction.id,
                 name: direction.name,
                 code: direction.code,
-                createdDate: direction.createdDate,
+                subjects: direction.subjects,
                 isDeleted: true,
               );
 
@@ -332,21 +350,20 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                             border: Border.all(color: const Color(0xFFE5E7EB)),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withAlpha(13),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
                             ],
                           ),
                           child: TextField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Yo\'nalish nomini qidirish...',
-                              hintStyle:
-                                  const TextStyle(color: Color(0xFF9CA3AF)),
-                              prefixIcon: const Icon(Icons.search,
-                                  color: Color(0xFF6B7280)),
+                              hintStyle: TextStyle(color: Color(0xFF9CA3AF)),
+                              prefixIcon:
+                                  Icon(Icons.search, color: Color(0xFF6B7280)),
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
+                              contentPadding: EdgeInsets.symmetric(
                                   vertical: 14, horizontal: 16),
                             ),
                             style: const TextStyle(fontSize: 15),
@@ -356,121 +373,40 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Table header
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                              color: AppColors.primary.withOpacity(0.1)),
-                        ),
-                        child: const Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                '#',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                'Yo\'nalish nomi',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'Yo\'nalish kodi',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'Yaratilgan sana',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                'Amallar',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Table content
                       Expanded(
-                        child: _filteredDirections.isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.search_off,
-                                        size: 64, color: Colors.grey.shade400),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Yo\'nalishlar topilmadi',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey.shade600),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Yangi yo\'nalish qo\'shish uchun + tugmasini bosing',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey.shade500),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                itemCount: _filteredDirections.length,
-                                itemBuilder: (context, index) {
-                                  final direction = _filteredDirections[index];
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 8),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                // color: Colors.red,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(13),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  // Table header
+                                  Container(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 12, horizontal: 16),
+                                        vertical: 14, horizontal: 16),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppColors.primary.withAlpha(13),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                          color: const Color(0xFFE5E7EB)),
+                                          color:
+                                              AppColors.primary.withAlpha(25)),
                                     ),
-                                    child: Row(
+                                    child: const Row(
                                       children: [
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            '${index + 1}',
-                                            style: const TextStyle(
+                                            '#',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
                                               color: Color(0xFF1F2937),
                                             ),
                                           ),
@@ -478,8 +414,9 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                                         Expanded(
                                           flex: 3,
                                           child: Text(
-                                            direction.name,
-                                            style: const TextStyle(
+                                            'Yo\'nalish nomi',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
                                               color: Color(0xFF1F2937),
                                             ),
                                           ),
@@ -487,58 +424,316 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                                         Expanded(
                                           flex: 2,
                                           child: Text(
-                                            direction.code,
-                                            style: const TextStyle(
+                                            'Yo\'nalish kodi',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
                                               color: Color(0xFF1F2937),
                                             ),
                                           ),
                                         ),
                                         Expanded(
-                                          flex: 2,
+                                          flex: 3,
                                           child: Text(
-                                            direction.createdDate,
-                                            style: const TextStyle(
+                                            'Fanlar',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
                                               color: Color(0xFF1F2937),
                                             ),
                                           ),
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () =>
-                                                    _showEditDirectionDialog(
-                                                        context, direction),
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: AppColors.primary,
-                                                  size: 20,
-                                                ),
-                                                tooltip: 'Tahrirlash',
-                                              ),
-                                              IconButton(
-                                                onPressed: () =>
-                                                    _showDeleteConfirmationDialog(
-                                                        context, direction),
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
-                                                  size: 20,
-                                                ),
-                                                tooltip: 'O\'chirish',
-                                              ),
-                                            ],
+                                          child: Text(
+                                            'Amallar',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF1F2937),
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  );
-                                },
-                              ),
-                      ),
+                                  ),
+                                  const SizedBox(height: 8),
+
+                                  // Table content
+                                  Expanded(
+                                    child: _filteredDirections.isEmpty
+                                        ? Center(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.search_off,
+                                                    size: 64,
+                                                    color:
+                                                        Colors.grey.shade400),
+                                                const SizedBox(height: 16),
+                                                Text(
+                                                  'Yo\'nalishlar topilmadi',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      color:
+                                                          Colors.grey.shade600),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  'Yangi yo\'nalish qo\'shish uchun + tugmasini bosing',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          Colors.grey.shade500),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : ListView.builder(
+                                            itemCount:
+                                                _filteredDirections.length,
+                                            itemBuilder: (context, index) {
+                                              final direction =
+                                                  _filteredDirections[index];
+                                              return Container(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 8),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 16),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                      color: const Color(
+                                                          0xFFE5E7EB)),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Text(
+                                                        '${index + 1}',
+                                                        style: const TextStyle(
+                                                          color:
+                                                              Color(0xFF1F2937),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Text(
+                                                        direction.name,
+                                                        style: const TextStyle(
+                                                          color:
+                                                              Color(0xFF1F2937),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: Text(
+                                                        direction.code,
+                                                        style: const TextStyle(
+                                                          color:
+                                                              Color(0xFF1F2937),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            direction.subjects
+                                                                    .isEmpty
+                                                                ? 'Fan qo\'shilmagan'
+                                                                : '${direction.subjectsCount} ta fan',
+                                                            style:
+                                                                const TextStyle(
+                                                              color: Color(
+                                                                  0xFF1F2937),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 13,
+                                                            ),
+                                                          ),
+                                                          if (direction.subjects
+                                                              .isNotEmpty)
+                                                            Text(
+                                                              direction.subjects
+                                                                  .join(', '),
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: Color(
+                                                                    0xFF6B7280),
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              maxLines: 1,
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          InkWell(
+                                                            onTap: () =>
+                                                                _showEditDirectionDialog(
+                                                                    context,
+                                                                    direction),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                            child:
+                                                                const Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(4.0),
+                                                              child: Icon(
+                                                                Icons.edit,
+                                                                color: AppColors
+                                                                    .primary,
+                                                                size: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 4),
+                                                          InkWell(
+                                                            onTap: () =>
+                                                                _showDeleteConfirmationDialog(
+                                                                    context,
+                                                                    direction),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                            child:
+                                                                const Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(4.0),
+                                                              child: Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    Colors.red,
+                                                                size: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                  ),
+                                  // Pagination footer
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 12),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFF3F4F6),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(12),
+                                        bottomRight: Radius.circular(12),
+                                      ),
+                                      border: Border(
+                                        top: BorderSide(
+                                          color: Color(0xFFE5E7EB),
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '1-${_filteredDirections.length} / ${_filteredDirections.length}',
+                                          style: const TextStyle(
+                                              color: Color(0xFF6B7280)),
+                                        ),
+                                        Row(
+                                          children: [
+                                            // Rows per page dropdown
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Qatorlar: ',
+                                                  style: TextStyle(
+                                                      color: Color(0xFF6B7280)),
+                                                ),
+                                                DropdownButton<int>(
+                                                  value: 10,
+                                                  underline: Container(),
+                                                  items: [5, 10, 20, 50]
+                                                      .map((count) =>
+                                                          DropdownMenuItem<int>(
+                                                            value: count,
+                                                            child:
+                                                                Text('$count'),
+                                                          ))
+                                                      .toList(),
+                                                  onChanged: (value) {
+                                                    // Pagination functionality will be implemented later
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 16),
+                                            // Pagination controls
+                                            const IconButton(
+                                              icon: Icon(Icons.first_page),
+                                              onPressed:
+                                                  null, // Will be implemented later
+                                              color: Color(0xFFD1D5DB),
+                                            ),
+                                            const IconButton(
+                                              icon: Icon(Icons.chevron_left),
+                                              onPressed:
+                                                  null, // Will be implemented later
+                                              color: Color(0xFFD1D5DB),
+                                            ),
+                                            const IconButton(
+                                              icon: Icon(Icons.chevron_right),
+                                              onPressed:
+                                                  null, // Will be implemented later
+                                              color: Color(0xFFD1D5DB),
+                                            ),
+                                            const IconButton(
+                                              icon: Icon(Icons.last_page),
+                                              onPressed:
+                                                  null, // Will be implemented later
+                                              color: Color(0xFFD1D5DB),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ))),
                     ],
                   ),
                 ),

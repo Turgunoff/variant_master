@@ -22,9 +22,9 @@ class DirectionsTable extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.05),
+            color: AppColors.primary.withAlpha(13),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+            border: Border.all(color: AppColors.primary.withAlpha(25)),
           ),
           child: const Row(
             children: [
@@ -61,7 +61,7 @@ class DirectionsTable extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Text(
-                  'Yaratilgan sana',
+                  'Fanlar',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1F2937),
@@ -94,7 +94,8 @@ class DirectionsTable extends StatelessWidget {
                     final direction = directions[index];
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
@@ -131,11 +132,31 @@ class DirectionsTable extends StatelessWidget {
                           ),
                           Expanded(
                             flex: 2,
-                            child: Text(
-                              direction.createdDate,
-                              style: const TextStyle(
-                                color: Color(0xFF1F2937),
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  direction.subjects.isEmpty
+                                      ? 'Fan qo\'shilmagan'
+                                      : '${direction.subjectsCount} ta fan',
+                                  style: const TextStyle(
+                                    color: Color(0xFF1F2937),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                if (direction.subjects.isNotEmpty)
+                                  Text(
+                                    direction.subjects.join(', '),
+                                    style: const TextStyle(
+                                      color: Color(0xFF6B7280),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                              ],
                             ),
                           ),
                           Expanded(
