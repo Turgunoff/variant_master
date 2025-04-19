@@ -186,15 +186,8 @@ class AppDrawer extends StatelessWidget {
         ),
       ]);
     } else if (user.role == UserRole.teacher) {
-      menuItems.addAll([
-        // Teacher faqat dashboard va variant yaratish qismlariga kirishi mumkin
-        _buildMenuItem(
-          context,
-          title: 'Variant yaratish',
-          icon: Icons.create,
-          route: '/create-variant',
-        ),
-      ]);
+      // Teacher faqat dashboard ko'ra oladi
+      menuItems.addAll([]);
     }
 
     return menuItems;

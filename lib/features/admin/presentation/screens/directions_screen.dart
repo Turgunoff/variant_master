@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:variant_master/core/theme/app_colors.dart';
+import 'package:variant_master/core/utils/snackbar_utils.dart';
 import 'package:variant_master/features/auth/bloc/auth_bloc.dart';
 import 'package:variant_master/features/auth/domain/entities/user.dart';
 import 'package:variant_master/features/admin/presentation/widgets/app_drawer.dart';
 import 'package:variant_master/features/admin/domain/entities/direction.dart';
 import 'package:variant_master/features/admin/presentation/widgets/direction_dialogs.dart';
+import 'package:variant_master/features/admin/presentation/widgets/table_pagination_footer.dart';
 
 class DirectionsScreen extends StatefulWidget {
   const DirectionsScreen({super.key});
@@ -16,6 +18,18 @@ class DirectionsScreen extends StatefulWidget {
 }
 
 class _DirectionsScreenState extends State<DirectionsScreen> {
+  // Pagination helpers
+  int get _startIndex => _currentPage * _rowsPerPage;
+  int get _endIndex => (_startIndex + _rowsPerPage) > _filteredDirections.length
+      ? _filteredDirections.length
+      : _startIndex + _rowsPerPage;
+
+  // Get paginated directions
+  List<Direction> _getPaginatedDirections() {
+    if (_filteredDirections.isEmpty) return [];
+    return _filteredDirections.sublist(_startIndex, _endIndex);
+  }
+
   // Mock data
   late List<Direction> _directions;
   late List<Direction> _filteredDirections;
@@ -23,7 +37,9 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
   // Track the next available ID
   int _nextId = 1;
 
-  // Pagination variables will be implemented later
+  // Pagination variables
+  int _rowsPerPage = 10;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -141,27 +157,9 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
 
           // Show success message
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '${newDirection.name} yo\'nalishi muvaffaqiyatli qo\'shildi',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: Colors.green.shade600,
-                duration: const Duration(seconds: 3),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                margin: const EdgeInsets.all(16),
-              ),
+            SnackBarUtils.showSuccessSnackBar(
+              context,
+              '${newDirection.name} yo\'nalishi muvaffaqiyatli qo\'shildi',
             );
           });
         },
@@ -195,27 +193,9 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
 
           // Show success message
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '${updatedDirection.name} yo\'nalishi muvaffaqiyatli yangilandi',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: Colors.green.shade600,
-                duration: const Duration(seconds: 3),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                margin: const EdgeInsets.all(16),
-              ),
+            SnackBarUtils.showSuccessSnackBar(
+              context,
+              '${updatedDirection.name} yo\'nalishi muvaffaqiyatli yangilandi',
             );
           });
         },
@@ -251,27 +231,9 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
           });
 
           // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      '${direction.name} yo\'nalishi muvaffaqiyatli o\'chirildi',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red.shade600,
-              duration: const Duration(seconds: 3),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              margin: const EdgeInsets.all(16),
-            ),
+          SnackBarUtils.showSuccessSnackBar(
+            context,
+            '${direction.name} yo\'nalishi muvaffaqiyatli o\'chirildi',
           );
         },
       ),
@@ -488,11 +450,12 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                                             ),
                                           )
                                         : ListView.builder(
-                                            itemCount:
-                                                _filteredDirections.length,
+                                            itemCount: _getPaginatedDirections()
+                                                .length,
                                             itemBuilder: (context, index) {
                                               final direction =
-                                                  _filteredDirections[index];
+                                                  _getPaginatedDirections()[
+                                                      index];
                                               return Container(
                                                 margin: const EdgeInsets.only(
                                                     bottom: 8),
@@ -649,88 +612,21 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                                           ),
                                   ),
                                   // Pagination footer
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFF3F4F6),
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(12),
-                                        bottomRight: Radius.circular(12),
-                                      ),
-                                      border: Border(
-                                        top: BorderSide(
-                                          color: Color(0xFFE5E7EB),
-                                          width: 1,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '1-${_filteredDirections.length} / ${_filteredDirections.length}',
-                                          style: const TextStyle(
-                                              color: Color(0xFF6B7280)),
-                                        ),
-                                        Row(
-                                          children: [
-                                            // Rows per page dropdown
-                                            Row(
-                                              children: [
-                                                const Text(
-                                                  'Qatorlar: ',
-                                                  style: TextStyle(
-                                                      color: Color(0xFF6B7280)),
-                                                ),
-                                                DropdownButton<int>(
-                                                  value: 10,
-                                                  underline: Container(),
-                                                  items: [5, 10, 20, 50]
-                                                      .map((count) =>
-                                                          DropdownMenuItem<int>(
-                                                            value: count,
-                                                            child:
-                                                                Text('$count'),
-                                                          ))
-                                                      .toList(),
-                                                  onChanged: (value) {
-                                                    // Pagination functionality will be implemented later
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(width: 16),
-                                            // Pagination controls
-                                            const IconButton(
-                                              icon: Icon(Icons.first_page),
-                                              onPressed:
-                                                  null, // Will be implemented later
-                                              color: Color(0xFFD1D5DB),
-                                            ),
-                                            const IconButton(
-                                              icon: Icon(Icons.chevron_left),
-                                              onPressed:
-                                                  null, // Will be implemented later
-                                              color: Color(0xFFD1D5DB),
-                                            ),
-                                            const IconButton(
-                                              icon: Icon(Icons.chevron_right),
-                                              onPressed:
-                                                  null, // Will be implemented later
-                                              color: Color(0xFFD1D5DB),
-                                            ),
-                                            const IconButton(
-                                              icon: Icon(Icons.last_page),
-                                              onPressed:
-                                                  null, // Will be implemented later
-                                              color: Color(0xFFD1D5DB),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                  TablePaginationFooter(
+                                    currentPage: _currentPage,
+                                    totalItems: _filteredDirections.length,
+                                    rowsPerPage: _rowsPerPage,
+                                    onPageChanged: (page) {
+                                      setState(() {
+                                        _currentPage = page;
+                                      });
+                                    },
+                                    onRowsPerPageChanged: (value) {
+                                      setState(() {
+                                        _rowsPerPage = value;
+                                        _currentPage = 0; // Reset to first page
+                                      });
+                                    },
                                   ),
                                 ],
                               ))),

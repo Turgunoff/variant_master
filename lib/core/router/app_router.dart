@@ -13,7 +13,7 @@ import 'package:variant_master/features/auth/bloc/auth_bloc.dart';
 import 'package:variant_master/features/auth/presentation/screens/login_screen.dart';
 import 'package:variant_master/features/auth/presentation/screens/settings_screen.dart';
 import 'package:variant_master/features/moderator/presentation/screens/test_review_screen.dart';
-import 'package:variant_master/features/teacher/presentation/screens/create_variant_screen.dart';
+import 'package:variant_master/features/admin/presentation/screens/create_variant_screen.dart';
 import 'package:variant_master/features/teacher/presentation/screens/dashboard_screen.dart';
 import 'package:variant_master/features/teacher/presentation/screens/tests_screen.dart';
 
@@ -46,9 +46,9 @@ class AppRouter {
       if (isAuthenticated) {
         final user = authState.user;
 
-        // Teacher can only access dashboard and create-variant
+        // Teacher can only access dashboard
         if (user.role == UserRole.teacher) {
-          final allowedRoutes = ['/dashboard', '/create-variant'];
+          final allowedRoutes = ['/dashboard'];
           if (!allowedRoutes.contains(currentPath)) {
             return '/dashboard';
           }

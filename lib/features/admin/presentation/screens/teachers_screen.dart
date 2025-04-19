@@ -8,6 +8,7 @@ import 'package:variant_master/features/auth/domain/entities/user.dart';
 import 'package:variant_master/features/admin/presentation/widgets/app_drawer.dart';
 import 'package:variant_master/features/admin/domain/entities/teacher.dart';
 import 'package:variant_master/features/admin/presentation/widgets/teacher_dialogs.dart';
+import 'package:variant_master/features/admin/presentation/widgets/table_pagination_footer.dart';
 
 class TeachersScreen extends StatefulWidget {
   const TeachersScreen({super.key});
@@ -464,109 +465,21 @@ class _TeachersScreenState extends State<TeachersScreen> {
                               ),
 
                               // Pagination footer
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFF3F4F6),
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(12),
-                                    bottomRight: Radius.circular(12),
-                                  ),
-                                  border: Border(
-                                    top: BorderSide(
-                                      color: Color(0xFFE5E7EB),
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${_startIndex + 1}-$_endIndex / ${_filteredTeachers.length}',
-                                      style: const TextStyle(
-                                          color: Color(0xFF6B7280)),
-                                    ),
-                                    Row(
-                                      children: [
-                                        // Rows per page dropdown
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Qatorlar: ',
-                                              style: TextStyle(
-                                                  color: Color(0xFF6B7280)),
-                                            ),
-                                            DropdownButton<int>(
-                                              value: _rowsPerPage,
-                                              underline: Container(),
-                                              items: [5, 10, 20, 50]
-                                                  .map((count) =>
-                                                      DropdownMenuItem<int>(
-                                                        value: count,
-                                                        child: Text('$count'),
-                                                      ))
-                                                  .toList(),
-                                              onChanged: (value) {
-                                                if (value != null) {
-                                                  setState(() {
-                                                    _rowsPerPage = value;
-                                                    _currentPage =
-                                                        0; // Reset to first page
-                                                  });
-                                                }
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 16),
-                                        // Pagination controls
-                                        IconButton(
-                                          icon: const Icon(Icons.first_page),
-                                          onPressed: _currentPage > 0
-                                              ? () => setState(
-                                                  () => _currentPage = 0)
-                                              : null,
-                                          color: _currentPage > 0
-                                              ? AppColors.primary
-                                              : const Color(0xFFD1D5DB),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.chevron_left),
-                                          onPressed: _currentPage > 0
-                                              ? () =>
-                                                  setState(() => _currentPage--)
-                                              : null,
-                                          color: _currentPage > 0
-                                              ? AppColors.primary
-                                              : const Color(0xFFD1D5DB),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.chevron_right),
-                                          onPressed: _hasNextPage
-                                              ? () =>
-                                                  setState(() => _currentPage++)
-                                              : null,
-                                          color: _hasNextPage
-                                              ? AppColors.primary
-                                              : const Color(0xFFD1D5DB),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.last_page),
-                                          onPressed: _hasNextPage
-                                              ? () => setState(
-                                                  () => _currentPage = _maxPage)
-                                              : null,
-                                          color: _hasNextPage
-                                              ? AppColors.primary
-                                              : const Color(0xFFD1D5DB),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                              TablePaginationFooter(
+                                currentPage: _currentPage,
+                                totalItems: _filteredTeachers.length,
+                                rowsPerPage: _rowsPerPage,
+                                onPageChanged: (page) {
+                                  setState(() {
+                                    _currentPage = page;
+                                  });
+                                },
+                                onRowsPerPageChanged: (value) {
+                                  setState(() {
+                                    _rowsPerPage = value;
+                                    _currentPage = 0; // Reset to first page
+                                  });
+                                },
                               ),
                             ],
                           ),
@@ -588,8 +501,6 @@ class _TeachersScreenState extends State<TeachersScreen> {
   int get _endIndex => (_startIndex + _rowsPerPage) > _filteredTeachers.length
       ? _filteredTeachers.length
       : _startIndex + _rowsPerPage;
-  bool get _hasNextPage => _endIndex < _filteredTeachers.length;
-  int get _maxPage => (_filteredTeachers.length / _rowsPerPage).ceil() - 1;
 
   // Get paginated teachers
   List<Teacher> _getPaginatedTeachers() {
