@@ -151,14 +151,13 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                             ],
                           ),
                           child: TextField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Fan nomini qidirish...',
-                              hintStyle:
-                                  const TextStyle(color: Color(0xFF9CA3AF)),
-                              prefixIcon: const Icon(Icons.search,
-                                  color: Color(0xFF6B7280)),
+                              hintStyle: TextStyle(color: Color(0xFF9CA3AF)),
+                              prefixIcon:
+                                  Icon(Icons.search, color: Color(0xFF6B7280)),
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
+                              contentPadding: EdgeInsets.symmetric(
                                   vertical: 14, horizontal: 16),
                             ),
                             style: const TextStyle(fontSize: 15),
@@ -173,12 +172,12 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(20),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -187,24 +186,23 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                               // Table header
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 16),
-                                decoration: const BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(12),
-                                    topRight: Radius.circular(12),
-                                  ),
+                                    vertical: 14, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.05),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color:
+                                          AppColors.primary.withOpacity(0.1)),
                                 ),
                                 child: const Row(
                                   children: [
                                     Expanded(
                                       flex: 1,
                                       child: Text(
-                                        'ID',
+                                        '#',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                          color: Color(0xFF1F2937),
                                         ),
                                       ),
                                     ),
@@ -214,8 +212,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Fan nomi',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                          color: Color(0xFF1F2937),
                                         ),
                                       ),
                                     ),
@@ -225,8 +222,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Testlar soni',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                          color: Color(0xFF1F2937),
                                         ),
                                       ),
                                     ),
@@ -236,8 +232,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Mavzular',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                          color: Color(0xFF1F2937),
                                         ),
                                       ),
                                     ),
@@ -247,8 +242,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                         'Amallar',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                          color: Color(0xFF1F2937),
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -260,8 +254,30 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                               // Table content with scrolling
                               Expanded(
                                 child: _filteredSubjects.isEmpty
-                                    ? const Center(
-                                        child: Text('Ma\'lumot topilmadi'))
+                                    ? Center(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.search_off,
+                                                size: 64,
+                                                color: Colors.grey.shade400),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'Fanlar topilmadi',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: Colors.grey.shade600),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Yangi fan qo\'shish uchun + tugmasini bosing',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey.shade500),
+                                            ),
+                                          ],
+                                        ),
+                                      )
                                     : ListView.builder(
                                         itemCount:
                                             _getPaginatedSubjects().length,
@@ -269,19 +285,18 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                           final subject =
                                               _getPaginatedSubjects()[index];
                                           return Container(
-                                            decoration: BoxDecoration(
-                                              color: index % 2 == 0
-                                                  ? Colors.white
-                                                  : const Color(0xFFF9FAFB),
-                                              border: const Border(
-                                                bottom: BorderSide(
-                                                  color: Color(0xFFE5E7EB),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            ),
+                                            margin: const EdgeInsets.only(
+                                                bottom: 8),
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 14),
+                                                vertical: 12, horizontal: 16),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0xFFE5E7EB)),
+                                            ),
                                             child: Row(
                                               children: [
                                                 Expanded(
@@ -290,8 +305,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     subject.id,
                                                     style: const TextStyle(
                                                       color: Color(0xFF1F2937),
-                                                      fontWeight:
-                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -301,8 +314,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     subject.name,
                                                     style: const TextStyle(
                                                       color: Color(0xFF1F2937),
-                                                      fontWeight:
-                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -312,8 +323,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                     '${subject.testsCount}',
                                                     style: const TextStyle(
                                                       color: Color(0xFF1F2937),
-                                                      fontWeight:
-                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -333,7 +342,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                               Color(0xFF1F2937),
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 13,
                                                         ),
                                                       ),
                                                       if (subject
@@ -345,9 +353,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                                               const TextStyle(
                                                             color: Color(
                                                                 0xFF6B7280),
-                                                            fontSize: 12,
-                                                            fontWeight:
-                                                                FontWeight.w400,
                                                           ),
                                                           overflow: TextOverflow
                                                               .ellipsis,
@@ -569,7 +574,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 16),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
                           AppColors.primary,
@@ -578,7 +583,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: const BorderRadius.only(
+                      borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
                       ),
@@ -847,7 +852,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 16),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
                           AppColors.primary,
@@ -856,7 +861,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: const BorderRadius.only(
+                      borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
                       ),
@@ -1102,12 +1107,11 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.warning_amber_rounded,
-                color: Colors.red, size: 28),
-            const SizedBox(width: 8),
-            const Text('Fanni o\'chirish'),
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+            SizedBox(width: 8),
+            Text('Fanni o\'chirish'),
           ],
         ),
         content: Column(
