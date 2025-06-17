@@ -11,7 +11,7 @@ class TestsListPage extends StatefulWidget {
 
 class _TestsListPageState extends State<TestsListPage> {
   String _selectedSubject = 'Barchasi';
-  
+
   final List<String> _subjects = [
     'Barchasi',
     'Matematika',
@@ -30,7 +30,9 @@ class _TestsListPageState extends State<TestsListPage> {
     if (_selectedSubject == 'Barchasi') {
       return box.values.toList();
     }
-    return box.values.where((test) => test.subject == _selectedSubject).toList();
+    return box.values
+        .where((test) => test.subject == _selectedSubject)
+        .toList();
   }
 
   void _deleteTest(int index, TestModel test) {
@@ -55,7 +57,10 @@ class _TestsListPageState extends State<TestsListPage> {
                 ),
               );
             },
-            child: const Text('O\'chirish', style: TextStyle(color: Colors.red)),
+            child: const Text(
+              'O\'chirish',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -101,7 +106,9 @@ class _TestsListPageState extends State<TestsListPage> {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: isCorrect ? Colors.green : Colors.grey.shade200,
+                          color: isCorrect
+                              ? Colors.green
+                              : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
@@ -119,13 +126,19 @@ class _TestsListPageState extends State<TestsListPage> {
                         child: Text(
                           answer,
                           style: TextStyle(
-                            fontWeight: isCorrect ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isCorrect
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                             color: isCorrect ? Colors.green : null,
                           ),
                         ),
                       ),
                       if (isCorrect)
-                        const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 20,
+                        ),
                     ],
                   ),
                 );
@@ -146,13 +159,8 @@ class _TestsListPageState extends State<TestsListPage> {
   @override
   Widget build(BuildContext context) {
     final box = Hive.box<TestModel>('tests');
-    
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Testlar ro\'yxati'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
       body: Column(
         children: [
           // Filter
@@ -170,7 +178,10 @@ class _TestsListPageState extends State<TestsListPage> {
                     value: _selectedSubject,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
                     items: _subjects.map((subject) {
                       return DropdownMenuItem(
@@ -188,14 +199,14 @@ class _TestsListPageState extends State<TestsListPage> {
               ],
             ),
           ),
-          
+
           // Tests list
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: box.listenable(),
               builder: (context, Box<TestModel> box, _) {
                 final filteredTests = _getFilteredTests(box);
-                
+
                 if (filteredTests.isEmpty) {
                   return Center(
                     child: Column(
@@ -208,7 +219,7 @@ class _TestsListPageState extends State<TestsListPage> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          _selectedSubject == 'Barchasi' 
+                          _selectedSubject == 'Barchasi'
                               ? 'Hech qanday test topilmadi'
                               : '$_selectedSubject yo\'nalishi bo\'yicha test topilmadi',
                           style: TextStyle(
@@ -218,7 +229,8 @@ class _TestsListPageState extends State<TestsListPage> {
                         ),
                         const SizedBox(height: 8),
                         TextButton.icon(
-                          onPressed: () => Navigator.pushNamed(context, '/add_test'),
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/add_test'),
                           icon: const Icon(Icons.add),
                           label: const Text('Yangi test qo\'shish'),
                         ),
@@ -226,7 +238,7 @@ class _TestsListPageState extends State<TestsListPage> {
                     ),
                   );
                 }
-                
+
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: filteredTests.length,
@@ -274,7 +286,10 @@ class _TestsListPageState extends State<TestsListPage> {
                                 children: [
                                   Icon(Icons.delete, color: Colors.red),
                                   SizedBox(width: 8),
-                                  Text('O\'chirish', style: TextStyle(color: Colors.red)),
+                                  Text(
+                                    'O\'chirish',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ],
                               ),
                             ),

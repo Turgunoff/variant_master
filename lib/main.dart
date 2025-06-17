@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:variant_master/pages/tests_list_page.dart';
 import 'models/test_model.dart';
 import 'models/variant_model.dart';
 import 'pages/add_test_page.dart';
-import 'pages/test_list_page.dart';
 import 'pages/create_variant_page.dart';
 import 'pages/saved_variants_page.dart';
 import 'pages/settings_page.dart';
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         '/add_test': (context) => const AddTestPage(),
-        '/test_list': (context) => const TestListPage(),
+        '/test_list': (context) => const TestsListPage(),
         '/create_variant': (context) => const CreateVariantPage(),
         '/saved_variants': (context) => const SavedVariantsPage(),
         '/settings': (context) => const SettingsPage(),
@@ -57,7 +57,7 @@ class _AppState extends State<App> {
   final List<Widget> _pages = const [
     HomePage(),
     AddTestPage(),
-    TestListPage(),
+    TestsListPage(),
     CreateVariantPage(),
     SavedVariantsPage(),
     SettingsPage(),
