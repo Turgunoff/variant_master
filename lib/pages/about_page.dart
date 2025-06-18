@@ -1,18 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
-
-  void _copyToClipboard(BuildContext context, String text) {
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Nusxalandi'),
-        duration: Duration(seconds: 1),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,33 +12,16 @@ class AboutPage extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(
-                    Icons.quiz,
-                    size: 48,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Test Variantlari',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Versiya 1.0.0',
-                  style: TextStyle(fontSize: 15, color: Colors.grey),
+                Image.asset(
+                  color: Colors.deepPurpleAccent,
+                  'assets/logo/logo.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.contain,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),

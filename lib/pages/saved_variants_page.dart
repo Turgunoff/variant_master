@@ -214,13 +214,6 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
                     'Hech qanday variant topilmadi',
                     style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                   ),
-                  const SizedBox(height: 8),
-                  TextButton.icon(
-                    onPressed: () =>
-                        Navigator.pushNamed(context, '/create_variant'),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Yangi variant yaratish'),
-                  ),
                 ],
               ),
             );

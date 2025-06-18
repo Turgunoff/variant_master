@@ -38,13 +38,12 @@ class HomePage extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Icon(Icons.quiz, size: 64, color: Colors.blue),
-                const SizedBox(height: 8),
-                const Text(
-                  'Test Variantlari',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                Image.asset(
+                  'assets/logo/logo.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 4),
                 const Text(
                   'Offline test va variantlar ilovasi',
                   style: TextStyle(fontSize: 16, color: Colors.grey),

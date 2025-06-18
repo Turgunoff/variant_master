@@ -13,6 +13,8 @@ import 'dart:math';
 
 Future<void> insertDemoTests() async {
   final box = Hive.box<TestModel>('tests');
+  if (box.length >= 50) return; // Oldin yuklangan bo'lsa, qaytadi
+
   final subjects = [
     'Matematika',
     'Tarix',
@@ -22,26 +24,18 @@ Future<void> insertDemoTests() async {
   ];
   final random = Random();
 
-  for (final subject in subjects) {
-    // Har bir fan uchun bazada nechta test borligini tekshiramiz
-    final existing = box.values.where((t) => t.subject == subject).length;
-    final toAdd = 50 - existing;
-    if (toAdd <= 0) continue;
-    for (int i = 1; i <= toAdd; i++) {
-      final correctIndex = random.nextInt(4);
-      final test = TestModel(
-        question: 'Demo test savoli $i ($subject)',
-        answers: List.generate(
-          4,
-          (j) => 'Javob ${String.fromCharCode(65 + j)}',
-        ),
-        correctIndex: correctIndex,
-        subject: subject,
-      );
-      await box.add(test);
-    }
+  for (int i = 1; i <= 50; i++) {
+    final subject = subjects[random.nextInt(subjects.length)];
+    final correctIndex = random.nextInt(4);
+    final test = TestModel(
+      question: 'Demo test savoli $i ($subject)',
+      answers: List.generate(4, (j) => 'Javob ${String.fromCharCode(65 + j)}'),
+      correctIndex: correctIndex,
+      subject: subject,
+    );
+    await box.add(test);
   }
-  print('Har bir fan uchun kamida 50 tadan demo test yuklandi!');
+  print('50 ta demo test muvaffaqiyatli yuklandi!');
 }
 
 void main() async {
@@ -51,7 +45,6 @@ void main() async {
   Hive.registerAdapter(VariantModelAdapter());
   await Hive.openBox<TestModel>('tests');
   await Hive.openBox<VariantModel>('variants');
-  await insertDemoTests(); // <-- faqat bir marta chaqiriladi
   runApp(const MyApp());
 }
 
@@ -123,12 +116,15 @@ class _AppState extends State<App> {
       drawer: Drawer(
         child: ListView(
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
               child: Center(
-                child: Text(
-                  'Test Variantlari',
-                  style: TextStyle(fontSize: 22, color: Colors.white),
+                child: Image.asset(
+                  color: Colors.white,
+                  'assets/logo/logo.png',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
