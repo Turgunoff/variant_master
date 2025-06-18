@@ -227,13 +227,6 @@ class _TestsListPageState extends State<TestsListPage> {
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        TextButton.icon(
-                          onPressed: () =>
-                              Navigator.pushNamed(context, '/add_test'),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Yangi test qo\'shish'),
-                        ),
                       ],
                     ),
                   );
@@ -311,12 +304,6 @@ class _TestsListPageState extends State<TestsListPage> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/add_test'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }

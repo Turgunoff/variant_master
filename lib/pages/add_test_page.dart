@@ -84,11 +84,6 @@ class _AddTestPageState extends State<AddTestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Yangi test qo\'shish'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(

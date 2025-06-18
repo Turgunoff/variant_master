@@ -85,42 +85,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Tezkor amallar',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              _QuickAction(
-                icon: Icons.add,
-                label: "Yangi test qo'shish",
-                color: Colors.blue,
-                onTap: () => Navigator.pushNamed(context, '/add_test'),
-              ),
-              _QuickAction(
-                icon: Icons.shuffle,
-                label: "Variant yaratish",
-                color: Colors.green,
-                onTap: () => Navigator.pushNamed(context, '/create_variant'),
-              ),
-              _QuickAction(
-                icon: Icons.list,
-                label: "Testlar ro'yxati",
-                color: Colors.orange,
-                onTap: () => Navigator.pushNamed(context, '/test_list'),
-              ),
-              _QuickAction(
-                icon: Icons.picture_as_pdf,
-                label: "Saqlangan variantlar",
-                color: Colors.purple,
-                onTap: () => Navigator.pushNamed(context, '/saved_variants'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
+
           if (lastTest != null) ...[
             const Text(
               'Oxirgi qo\'shilgan test',

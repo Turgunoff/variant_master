@@ -196,11 +196,6 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
     final box = Hive.box<VariantModel>('variants');
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Saqlangan variantlar'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
         builder: (context, Box<VariantModel> box, _) {
@@ -338,12 +333,6 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/create_variant'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }
