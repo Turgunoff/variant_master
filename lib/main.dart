@@ -9,6 +9,40 @@ import 'pages/saved_variants_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/about_page.dart';
 import 'pages/home_page.dart';
+import 'dart:math';
+
+Future<void> insertDemoTests() async {
+  final box = Hive.box<TestModel>('tests');
+  final subjects = [
+    'Matematika',
+    'Tarix',
+    'Fizika',
+    'Biologiya',
+    'Ingliz tili',
+  ];
+  final random = Random();
+
+  for (final subject in subjects) {
+    // Har bir fan uchun bazada nechta test borligini tekshiramiz
+    final existing = box.values.where((t) => t.subject == subject).length;
+    final toAdd = 50 - existing;
+    if (toAdd <= 0) continue;
+    for (int i = 1; i <= toAdd; i++) {
+      final correctIndex = random.nextInt(4);
+      final test = TestModel(
+        question: 'Demo test savoli $i ($subject)',
+        answers: List.generate(
+          4,
+          (j) => 'Javob ${String.fromCharCode(65 + j)}',
+        ),
+        correctIndex: correctIndex,
+        subject: subject,
+      );
+      await box.add(test);
+    }
+  }
+  print('Har bir fan uchun kamida 50 tadan demo test yuklandi!');
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +51,7 @@ void main() async {
   Hive.registerAdapter(VariantModelAdapter());
   await Hive.openBox<TestModel>('tests');
   await Hive.openBox<VariantModel>('variants');
+  await insertDemoTests(); // <-- faqat bir marta chaqiriladi
   runApp(const MyApp());
 }
 
