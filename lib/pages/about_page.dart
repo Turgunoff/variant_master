@@ -34,7 +34,7 @@ class AboutPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Test Variantlari — bu o‘qituvchilar va talabalar uchun offline test yaratish, variant tuzish va PDF saqlash imkonini beruvchi qulay ilova. Barcha ma’lumotlar qurilmada lokal saqlanadi.',
+                    'Variant Master — bu o‘qituvchilar va talabalar uchun offline test yaratish, variant tuzish va PDF saqlash imkonini beruvchi qulay ilova. Barcha ma’lumotlar qurilmada lokal saqlanadi.',
                     style: TextStyle(fontSize: 15, height: 1.5),
                   ),
                 ],

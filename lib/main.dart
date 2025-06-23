@@ -9,34 +9,6 @@ import 'pages/saved_variants_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/about_page.dart';
 import 'pages/home_page.dart';
-import 'dart:math';
-
-Future<void> insertDemoTests() async {
-  final box = Hive.box<TestModel>('tests');
-  if (box.length >= 50) return; // Oldin yuklangan bo'lsa, qaytadi
-
-  final subjects = [
-    'Matematika',
-    'Tarix',
-    'Fizika',
-    'Biologiya',
-    'Ingliz tili',
-  ];
-  final random = Random();
-
-  for (int i = 1; i <= 50; i++) {
-    final subject = subjects[random.nextInt(subjects.length)];
-    final correctIndex = random.nextInt(4);
-    final test = TestModel(
-      question: 'Demo test savoli $i ($subject)',
-      answers: List.generate(4, (j) => 'Javob ${String.fromCharCode(65 + j)}'),
-      correctIndex: correctIndex,
-      subject: subject,
-    );
-    await box.add(test);
-  }
-  print('50 ta demo test muvaffaqiyatli yuklandi!');
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Test Variantlari',
+      title: 'Variant Master',
       theme: ThemeData(
         brightness: Brightness.light, // Dark mode
         primarySwatch: Colors.blue,
@@ -99,7 +71,7 @@ class _AppState extends State<App> {
     "Variant yaratish",
     "Saqlangan variantlar",
     "Sozlamalar",
-    "Ilova haqida",
+    "Ilova haqida (Variant Master)",
   ];
 
   void _onDrawerItemTap(int index) {

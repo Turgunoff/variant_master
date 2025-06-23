@@ -1,4 +1,4 @@
-package com.example.variant_master
+package uz.variantmaster.variantmaster
 
 import io.flutter.embedding.android.FlutterActivity
 
