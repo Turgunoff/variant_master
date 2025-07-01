@@ -90,29 +90,18 @@ lib/
 
 ## 📸 Screenshotlar
 
-### Bosh sahifa
-
-<img src="screenshots/home.png" alt="Bosh sahifa" width="350" />
-
-### Yangi test qo‘shish
-
-<img src="screenshots/add_test.png" alt="Yangi test qo‘shish" width="350" />
-
-### Testlar ro‘yxati
-
-<img src="screenshots/tests.png" alt="Testlar ro‘yxati" width="350" />
-
-### Variant yaratish
-
-<img src="screenshots/create_variant.png" alt="Variant yaratish" width="350" />
-
-### Variantni saqlash
-
-<img src="screenshots/save_variant.png" alt="Variantni saqlash" width="350" />
-
-### Ilova haqida
-
-<img src="screenshots/about.png" alt="Ilova haqida" width="350" />
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/home.png" alt="Bosh sahifa" width="350" /><br>Bosh sahifa</td>
+    <td align="center"><img src="screenshots/add_test.png" alt="Yangi test qo‘shish" width="350" /><br>Yangi test qo‘shish</td>
+    <td align="center"><img src="screenshots/tests.png" alt="Testlar ro‘yxati" width="350" /><br>Testlar ro‘yxati</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/create_variant.png" alt="Variant yaratish" width="350" /><br>Variant yaratish</td>
+    <td align="center"><img src="screenshots/save_variant.png" alt="Variantni saqlash" width="350" /><br>Variantni saqlash</td>
+    <td align="center"><img src="screenshots/about.png" alt="Ilova haqida" width="350" /><br>Ilova haqida</td>
+  </tr>
+</table>
 
 ## 👨‍💻 Muallif va hissa qo‘shuvchilar
 
