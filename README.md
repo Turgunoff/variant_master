@@ -92,19 +92,27 @@ lib/
 
 ### Bosh sahifa
 
-![Bosh sahifa](screenshots/home.png)
+<img src="screenshots/home.png" alt="Bosh sahifa" width="350" />
 
 ### Yangi test qo‘shish
 
-![Yangi test qo‘shish](screenshots/add_test.png)
+<img src="screenshots/add_test.png" alt="Yangi test qo‘shish" width="350" />
+
+### Testlar ro‘yxati
+
+<img src="screenshots/tests.png" alt="Testlar ro‘yxati" width="350" />
 
 ### Variant yaratish
 
-![Variant yaratish](screenshots/create_variant.png)
+<img src="screenshots/create_variant.png" alt="Variant yaratish" width="350" />
 
-### Sozlamalar
+### Variantni saqlash
 
-![Sozlamalar](screenshots/settings.png)
+<img src="screenshots/save_variant.png" alt="Variantni saqlash" width="350" />
+
+### Ilova haqida
+
+<img src="screenshots/about.png" alt="Ilova haqida" width="350" />
 
 ## 👨‍💻 Muallif va hissa qo‘shuvchilar
 
