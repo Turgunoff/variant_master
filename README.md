@@ -14,10 +14,6 @@ Variant Master — bu o‘qituvchilar va talabalar uchun offline test va variant
 - Drawer menyu asosida qulay navigatsiya
 - Barcha matnlar o‘zbek tilida
 
-## 🖼️ Ilova ko‘rinishlari
-
-(Screenshotlar uchun joy)
-
 ## 🚀 Boshlash
 
 ### 1. Klonni yuklab oling
@@ -105,7 +101,7 @@ lib/
 
 ## 👨‍💻 Muallif va hissa qo‘shuvchilar
 
-- [Ismingiz yoki GitHub profilingiz]
+- Eldor Turgunov
 
 ## 📄 Litsenziya
 
