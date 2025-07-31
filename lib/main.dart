@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'Variant Master',
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         useMaterial3: true,
       ),
       home: const App(),
@@ -52,6 +52,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _pages = const [
     HomePage(),
@@ -76,13 +77,14 @@ class _AppState extends State<App> {
   void _onDrawerItemTap(int index) {
     setState(() {
       _selectedIndex = index;
-      Navigator.pop(context);
     });
+    _scaffoldKey.currentState?.closeEndDrawer();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: _selectedIndex == 0
@@ -96,21 +98,21 @@ class _AppState extends State<App> {
         surfaceTintColor: Colors.white,
         elevation: 0,
         centerTitle: _selectedIndex == 0 ? false : true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openEndDrawer();
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.menu),
+        //     onPressed: () {
+        //       _scaffoldKey.currentState?.openEndDrawer();
+        //     },
+        //   ),
+        // ],
       ),
-      endDrawer: Drawer(
+      drawer: Drawer(
         backgroundColor: Colors.white,
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Colors.green),
               child: Center(
                 child: Image.asset(
                   color: Colors.white,
@@ -124,36 +126,43 @@ class _AppState extends State<App> {
             ListTile(
               leading: const Icon(Icons.home),
               title: const Text("Главная страница"),
+              selected: _selectedIndex == 0,
               onTap: () => _onDrawerItemTap(0),
             ),
             ListTile(
               leading: const Icon(Icons.add),
               title: const Text("Добавить новый тест"),
+              selected: _selectedIndex == 1,
               onTap: () => _onDrawerItemTap(1),
             ),
             ListTile(
               leading: const Icon(Icons.list),
               title: const Text("Список тестов"),
+              selected: _selectedIndex == 2,
               onTap: () => _onDrawerItemTap(2),
             ),
             ListTile(
               leading: const Icon(Icons.shuffle),
               title: const Text("Создать вариант"),
+              selected: _selectedIndex == 3,
               onTap: () => _onDrawerItemTap(3),
             ),
             ListTile(
               leading: const Icon(Icons.picture_as_pdf),
               title: const Text("Сохраненные варианты"),
+              selected: _selectedIndex == 4,
               onTap: () => _onDrawerItemTap(4),
             ),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text("Настройки"),
+              selected: _selectedIndex == 5,
               onTap: () => _onDrawerItemTap(5),
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text("О приложении"),
+              selected: _selectedIndex == 6,
               onTap: () => _onDrawerItemTap(6),
             ),
           ],

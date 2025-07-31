@@ -45,24 +45,33 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'Настройки',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 24),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Темный режим (Dark mode)',
-                    style: TextStyle(fontSize: 16),
+                    'Внешний вид',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Switch(value: _isDarkMode, onChanged: _onThemeChanged),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Темная тема'),
+                      Switch(
+                        value: _isDarkMode,
+                        onChanged: _onThemeChanged,
+                        activeColor: Colors.green,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -74,22 +83,107 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Размер шрифта', style: TextStyle(fontSize: 16)),
-                  Slider(
-                    value: _fontSize,
-                    min: 12,
-                    max: 28,
-                    divisions: 8,
-                    label: _fontSize.toStringAsFixed(0),
-                    onChanged: _onFontSizeChanged,
+                  const Text(
+                    'Размер шрифта',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Маленький'),
-                      Text('${_fontSize.toStringAsFixed(0)} px'),
+                      Expanded(
+                        child: Slider(
+                          value: _fontSize,
+                          min: 12,
+                          max: 20,
+                          divisions: 8,
+                          activeColor: Colors.green,
+                          onChanged: _onFontSizeChanged,
+                        ),
+                      ),
                       const Text('Большой'),
                     ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Пример текста',
+                    style: TextStyle(fontSize: _fontSize),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'О приложении',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const ListTile(
+                    leading: Icon(Icons.info, color: Colors.green),
+                    title: Text('Версия'),
+                    subtitle: Text('1.0.0'),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.developer_mode, color: Colors.green),
+                    title: Text('Разработчик'),
+                    subtitle: Text('Variant Master Team'),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.email, color: Colors.green),
+                    title: Text('Email'),
+                    subtitle: Text('support@variantmaster.com'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Функции',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const ListTile(
+                    leading: Icon(Icons.quiz, color: Colors.green),
+                    title: Text('Добавление тестов'),
+                    subtitle: Text('Создавайте тесты по различным предметам'),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.picture_as_pdf, color: Colors.green),
+                    title: Text('Создание вариантов'),
+                    subtitle: Text('Генерируйте PDF варианты из тестов'),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.save, color: Colors.green),
+                    title: Text('Сохранение'),
+                    subtitle: Text('Все данные сохраняются локально'),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.share, color: Colors.green),
+                    title: Text('Поделиться'),
+                    subtitle: Text('Отправляйте варианты другим'),
                   ),
                 ],
               ),

@@ -349,22 +349,22 @@ class _AddTestPageState extends State<AddTestPage> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.green.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.blue.withOpacity(0.3),
+                            color: Colors.green.withOpacity(0.3),
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.info, color: Colors.blue),
+                            const Icon(Icons.info, color: Colors.green),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Правильный ответ: ${String.fromCharCode(65 + _correctAnswerIndex)}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
+                                  color: Colors.green,
                                 ),
                               ),
                             ),

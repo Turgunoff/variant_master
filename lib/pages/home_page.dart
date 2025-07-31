@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                   icon: Icons.quiz,
                   label: 'Всего тестов',
                   value: _tests.length.toString(),
-                  color: Colors.blue,
+                  color: Colors.green,
                 ),
                 const SizedBox(height: 12),
                 _StatCard(
@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                   icon: Icons.category,
                   label: 'Всего предметов',
                   value: subjects.length.toString(),
-                  color: Colors.orange,
+                  color: Colors.green,
                 ),
                 if (mostPopularSubject != null) ...[
                   const SizedBox(height: 12),
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                     icon: Icons.star,
                     label: 'Самый популярный предмет',
                     value: mostPopularSubject,
-                    color: Colors.purple,
+                    color: Colors.green,
                   ),
                 ],
               ],
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
               Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 child: ListTile(
-                  leading: const Icon(Icons.quiz, color: Colors.blue),
+                  leading: const Icon(Icons.quiz, color: Colors.green),
                   title: Text(
                     lastTest.question,
                     maxLines: 2,
