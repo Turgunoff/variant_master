@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -8,6 +7,7 @@ import 'dart:io';
 import 'dart:math';
 import '../models/test_model.dart';
 import '../models/variant_model.dart';
+import '../database/database_helper.dart';
 
 class CreateVariantPage extends StatefulWidget {
   const CreateVariantPage({super.key});
@@ -17,35 +17,61 @@ class CreateVariantPage extends StatefulWidget {
 }
 
 class _CreateVariantPageState extends State<CreateVariantPage> {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
   String? _selectedSubject;
   bool _isGenerating = false;
   List<TestModel>? _selectedTests;
+  List<String> _subjects = [];
 
-  List<String> get _subjects {
-    final box = Hive.box<TestModel>('tests');
-    return box.values.map((e) => e.subject).toSet().toList();
+  @override
+  void initState() {
+    super.initState();
+    _loadSubjects();
   }
 
-  List<TestModel> _getTestsBySubject(String subject) {
-    final box = Hive.box<TestModel>('tests');
-    return box.values.where((test) => test.subject == subject).toList();
+  Future<void> _loadSubjects() async {
+    try {
+      final testMaps = await _dbHelper.getAllTests();
+      final subjects = testMaps
+          .map((map) => map['subject'] as String)
+          .toSet()
+          .toList();
+      setState(() {
+        _subjects = subjects;
+      });
+    } catch (e) {
+      print('Ошибка загрузки предметов: $e');
+    }
   }
 
-  void _generateVariant() {
+  Future<List<TestModel>> _getTestsBySubject(String subject) async {
+    try {
+      final testMaps = await _dbHelper.getTestsBySubject(subject);
+      return testMaps.map((map) => TestModel.fromMap(map)).toList();
+    } catch (e) {
+      print('Ошибка загрузки тестов: $e');
+      return [];
+    }
+  }
+
+  void _generateVariant() async {
     if (_selectedSubject == null) return;
-    final availableTests = _getTestsBySubject(_selectedSubject!);
+
+    final availableTests = await _getTestsBySubject(_selectedSubject!);
     if (availableTests.length < 30) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Tanlangan yo\'nalishda kamida 30 ta test bo\'lishi kerak!',
+            'По выбранному предмету должно быть минимум 30 тестов!',
           ),
           backgroundColor: Colors.orange,
         ),
       );
       return;
     }
+
     setState(() => _isGenerating = true);
+
     Future.delayed(const Duration(milliseconds: 500), () {
       final random = Random();
       final shuffled = List<TestModel>.from(availableTests)..shuffle(random);
@@ -59,9 +85,11 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
   Future<void> _generatePDF() async {
     if (_selectedTests == null) return;
     setState(() => _isGenerating = true);
+
     try {
       final pdf = pw.Document();
       final variantNumber = Random().nextInt(9999) + 1;
+
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -69,7 +97,7 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
             return [
               pw.Center(
                 child: pw.Text(
-                  'TEST VARIANTI',
+                  'ТЕСТОВЫЙ ВАРИАНТ',
                   style: pw.TextStyle(
                     fontSize: 20,
                     fontWeight: pw.FontWeight.bold,
@@ -79,13 +107,13 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
               pw.SizedBox(height: 10),
               pw.Center(
                 child: pw.Text(
-                  'Yo\'nalish: $_selectedSubject',
+                  'Предмет: $_selectedSubject',
                   style: pw.TextStyle(fontSize: 14),
                 ),
               ),
               pw.Center(
                 child: pw.Text(
-                  'Variant raqami: $variantNumber',
+                  'Номер варианта: $variantNumber',
                   style: pw.TextStyle(fontSize: 14),
                 ),
               ),
@@ -116,7 +144,7 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
               }),
               pw.SizedBox(height: 24),
               pw.Text(
-                'JAVOBLAR KALITI',
+                'КЛЮЧ ОТВЕТОВ',
                 style: pw.TextStyle(
                   fontWeight: pw.FontWeight.bold,
                   fontSize: 16,
@@ -143,29 +171,35 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
           },
         ),
       );
+
       final dir = await getApplicationDocumentsDirectory();
       final file = File(
         '${dir.path}/variant_${variantNumber}_${DateTime.now().millisecondsSinceEpoch}.pdf',
       );
       await file.writeAsBytes(await pdf.save());
-      // Saqlash uchun variant modelini yaratish
+
+      // Создание модели варианта для сохранения
       final variant = VariantModel(
-        testIds: _selectedTests!.map((t) => t.key as int).toList(),
         subject: _selectedSubject!,
         createdAt: DateTime.now(),
         pdfPath: file.path,
+        testIds: _selectedTests!.map((t) => t.id!).toList(),
       );
-      final variantBox = Hive.box<VariantModel>('variants');
-      await variantBox.add(variant);
+
+      final variantId = await _dbHelper.insertVariant(variant.toMap());
+      await _dbHelper.insertVariantTests(variantId, variant.testIds);
+
       setState(() => _isGenerating = false);
       await Printing.layoutPdf(onLayout: (format) async => pdf.save());
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('PDF muvaffaqiyatli yaratildi va saqlandi!'),
+          content: Text('PDF успешно создан и сохранен!'),
           backgroundColor: Colors.green,
         ),
       );
-      // Sahifani to'liq yangilash (reset)
+
+      // Полный сброс страницы (reset)
       setState(() {
         _selectedSubject = null;
         _selectedTests = null;
@@ -174,7 +208,7 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
     } catch (e) {
       setState(() => _isGenerating = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Xatolik: $e'), backgroundColor: Colors.red),
+        SnackBar(content: Text('Ошибка: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -188,7 +222,7 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Variant yaratish',
+              'Создание варианта',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -202,7 +236,7 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                 _selectedTests = null;
               }),
               decoration: const InputDecoration(
-                labelText: 'Yo\'nalishni tanlang',
+                labelText: 'Выберите предмет',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -213,8 +247,8 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                   : null,
               icon: const Icon(Icons.shuffle),
               label: _isGenerating
-                  ? const Text('Yaratilmoqda...')
-                  : const Text('30 ta random test tanlash'),
+                  ? const Text('Создается...')
+                  : const Text('Выбрать 30 случайных тестов'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
               ),
@@ -229,17 +263,17 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Variant tayyor!',
+                        'Вариант готов!',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text('Fan: $_selectedSubject'),
-                      Text('Testlar soni: ${_selectedTests?.length ?? 0}'),
+                      Text('Предмет: $_selectedSubject'),
+                      Text('Количество тестов: ${_selectedTests?.length ?? 0}'),
                       const SizedBox(height: 12),
                       ElevatedButton.icon(
                         onPressed: _isGenerating ? null : _generatePDF,
                         icon: const Icon(Icons.picture_as_pdf),
-                        label: const Text('PDF yaratish va saqlash'),
+                        label: const Text('Создать и сохранить PDF'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                         ),
@@ -257,7 +291,7 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text(
-                'Variant yaratish uchun kamida 30 ta test kerak. PDF faylni yuklab olish va baham ko‘rish mumkin.',
+                'Для создания варианта нужно минимум 30 тестов. PDF файл можно скачать и поделиться.',
                 style: TextStyle(fontSize: 14),
               ),
             ),

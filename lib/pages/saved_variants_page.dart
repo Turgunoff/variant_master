@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:printing/printing.dart';
 import 'dart:io';
 import '../models/variant_model.dart';
 import '../models/test_model.dart';
+import '../database/database_helper.dart';
 
 class SavedVariantsPage extends StatefulWidget {
   const SavedVariantsPage({super.key});
@@ -13,52 +13,85 @@ class SavedVariantsPage extends StatefulWidget {
 }
 
 class _SavedVariantsPageState extends State<SavedVariantsPage> {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  List<VariantModel> _variants = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVariants();
+  }
+
+  Future<void> _loadVariants() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final variantMaps = await _dbHelper.getAllVariants();
+      _variants = variantMaps.map((map) => VariantModel.fromMap(map)).toList();
+
+      // Загружаем testIds для каждого варианта
+      for (int i = 0; i < _variants.length; i++) {
+        final testMapsForVariant = await _dbHelper.getTestsForVariant(
+          _variants[i].id!,
+        );
+        final testIds = testMapsForVariant
+            .map((map) => map['id'] as int)
+            .toList();
+        _variants[i] = _variants[i].copyWith(testIds: testIds);
+      }
+    } catch (e) {
+      print('Ошибка загрузки вариантов: $e');
+    }
+
+    setState(() => _isLoading = false);
+  }
+
   void _deleteVariant(VariantModel variant) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Variantni o\'chirish'),
+        title: const Text('Удалить вариант'),
         content: const Text(
-          'Ushbu variantni o\'chirishni xohlaysizmi? PDF fayl ham o\'chiriladi.',
+          'Вы хотите удалить этот вариант? PDF файл также будет удален.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Bekor qilish'),
+            child: const Text('Отмена'),
           ),
           TextButton(
             onPressed: () async {
               try {
-                // PDF faylni o'chirish
+                // Удаление PDF файла
                 final file = File(variant.pdfPath);
                 if (await file.exists()) {
                   await file.delete();
                 }
 
-                // Variant ma'lumotlarini o'chirish
-                await variant.delete();
+                // Удаление данных варианта
+                await _dbHelper.deleteVariantTests(variant.id!);
+                await _dbHelper.deleteVariant(variant.id!);
 
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Variant o\'chirildi'),
+                    content: Text('Вариант удален'),
                     backgroundColor: Colors.red,
                   ),
                 );
+                _loadVariants(); // Перезагружаем список
               } catch (e) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Xatolik: $e'),
+                    content: Text('Ошибка: $e'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: const Text(
-              'O\'chirish',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -74,7 +107,7 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('PDF fayl topilmadi'),
+            content: Text('PDF файл не найден'),
             backgroundColor: Colors.red,
           ),
         );
@@ -82,7 +115,7 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('PDF ochishda xatolik: $e'),
+          content: Text('Ошибка при открытии PDF: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -101,7 +134,7 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('PDF fayl topilmadi'),
+            content: Text('PDF файл не найден'),
             backgroundColor: Colors.red,
           ),
         );
@@ -109,48 +142,44 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('PDF baham ko\'rishda xatolik: $e'),
+          content: Text('Ошибка при отправке PDF: $e'),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  void _showVariantDetails(VariantModel variant) {
-    final testBox = Hive.box<TestModel>('tests');
-    final tests = variant.testIds
-        .map((id) => testBox.get(id))
-        .where((test) => test != null)
-        .cast<TestModel>()
-        .toList();
+  void _showVariantDetails(VariantModel variant) async {
+    final tests = await _dbHelper.getTestsForVariant(variant.id!);
+    final testModels = tests.map((map) => TestModel.fromMap(map)).toList();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Variant tafsilotlari'),
+        title: const Text('Детали варианта'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Yo\'nalish: ${variant.subject}',
+                'Предмет: ${variant.subject}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Yaratilgan sana: ${variant.createdAt.day}.${variant.createdAt.month}.${variant.createdAt.year}',
+                'Дата создания: ${variant.createdAt.day}.${variant.createdAt.month}.${variant.createdAt.year}',
               ),
               const SizedBox(height: 8),
-              Text('Testlar soni: ${tests.length} ta'),
+              Text('Количество тестов: ${testModels.length}'),
               const SizedBox(height: 16),
-              if (tests.isNotEmpty) ...[
+              if (testModels.isNotEmpty) ...[
                 const Text(
-                  'Testlar ro\'yxati:',
+                  'Список тестов:',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                ...tests.take(5).toList().asMap().entries.map((entry) {
+                ...testModels.take(5).toList().asMap().entries.map((entry) {
                   final index = entry.key + 1;
                   final test = entry.value;
                   return Padding(
@@ -161,9 +190,9 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
                     ),
                   );
                 }).toList(),
-                if (tests.length > 5)
+                if (testModels.length > 5)
                   Text(
-                    '... va yana ${tests.length - 5} ta test',
+                    '... и еще ${testModels.length - 5} тестов',
                     style: const TextStyle(
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
@@ -176,7 +205,7 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Yopish'),
+            child: const Text('Закрыть'),
           ),
         ],
       ),
@@ -193,137 +222,128 @@ class _SavedVariantsPageState extends State<SavedVariantsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final box = Hive.box<VariantModel>('variants');
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_variants.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.picture_as_pdf_outlined,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Варианты не найдены',
+              style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
-      body: ValueListenableBuilder(
-        valueListenable: box.listenable(),
-        builder: (context, Box<VariantModel> box, _) {
-          if (box.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _variants.length,
+        itemBuilder: (context, index) {
+          final variant = _variants[index];
+
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: ListTile(
+              leading: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.picture_as_pdf,
+                  color: Theme.of(context).primaryColor,
+                  size: 24,
+                ),
+              ),
+              title: Text(
+                variant.subject,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.picture_as_pdf_outlined,
-                    size: 64,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Hech qanday variant topilmadi',
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                  ),
+                  const SizedBox(height: 4),
+                  Text('Тестов: ${variant.testIds.length}'),
+                  Text('Дата: ${_formatDate(variant.createdAt)}'),
+                  Text('Время: ${_formatTime(variant.createdAt)}'),
                 ],
               ),
-            );
-          }
-
-          final variants = box.values.toList()
-            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: variants.length,
-            itemBuilder: (context, index) {
-              final variant = variants[index];
-
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.picture_as_pdf,
-                      color: Theme.of(context).primaryColor,
-                      size: 24,
+              trailing: PopupMenuButton(
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'open',
+                    child: Row(
+                      children: [
+                        Icon(Icons.open_in_new),
+                        SizedBox(width: 8),
+                        Text('Открыть PDF'),
+                      ],
                     ),
                   ),
-                  title: Text(
-                    variant.subject,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  const PopupMenuItem(
+                    value: 'share',
+                    child: Row(
+                      children: [
+                        Icon(Icons.share),
+                        SizedBox(width: 8),
+                        Text('Поделиться'),
+                      ],
+                    ),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text('Testlar: ${variant.testIds.length} ta'),
-                      Text('Sana: ${_formatDate(variant.createdAt)}'),
-                      Text('Vaqt: ${_formatTime(variant.createdAt)}'),
-                    ],
+                  const PopupMenuItem(
+                    value: 'details',
+                    child: Row(
+                      children: [
+                        Icon(Icons.info),
+                        SizedBox(width: 8),
+                        Text('Детали'),
+                      ],
+                    ),
                   ),
-                  trailing: PopupMenuButton(
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'open',
-                        child: Row(
-                          children: [
-                            Icon(Icons.open_in_new),
-                            SizedBox(width: 8),
-                            Text('PDF ochish'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'share',
-                        child: Row(
-                          children: [
-                            Icon(Icons.share),
-                            SizedBox(width: 8),
-                            Text('Baham ko\'rish'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'details',
-                        child: Row(
-                          children: [
-                            Icon(Icons.info),
-                            SizedBox(width: 8),
-                            Text('Tafsilotlar'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text(
-                              'O\'chirish',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'open':
-                          _openPDF(variant);
-                          break;
-                        case 'share':
-                          _sharePDF(variant);
-                          break;
-                        case 'details':
-                          _showVariantDetails(variant);
-                          break;
-                        case 'delete':
-                          _deleteVariant(variant);
-                          break;
-                      }
-                    },
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Удалить', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
                   ),
-                  onTap: () => _openPDF(variant),
-                ),
-              );
-            },
+                ],
+                onSelected: (value) {
+                  switch (value) {
+                    case 'open':
+                      _openPDF(variant);
+                      break;
+                    case 'share':
+                      _sharePDF(variant);
+                      break;
+                    case 'details':
+                      _showVariantDetails(variant);
+                      break;
+                    case 'delete':
+                      _deleteVariant(variant);
+                      break;
+                  }
+                },
+              ),
+              onTap: () => _openPDF(variant),
+            ),
           );
         },
       ),

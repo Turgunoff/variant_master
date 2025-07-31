@@ -29,12 +29,12 @@ class AboutPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    'Ilova haqida',
+                    'О приложении',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Variant Master — bu o‘qituvchilar va talabalar uchun offline test yaratish, variant tuzish va PDF saqlash imkonini beruvchi qulay ilova. Barcha ma’lumotlar qurilmada lokal saqlanadi.',
+                    'Variant Master — это удобное приложение для учителей и студентов, позволяющее создавать тесты, составлять варианты и сохранять PDF файлы. Все данные сохраняются локально на устройстве.',
                     style: TextStyle(fontSize: 15, height: 1.5),
                   ),
                 ],
@@ -49,34 +49,34 @@ class AboutPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Asosiy xususiyatlar',
+                    'Основные возможности',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   _FeatureItem(
                     icon: Icons.add_circle,
-                    title: 'Test yaratish',
-                    description: 'Turli yo‘nalishlar bo‘yicha testlar qo‘shish',
+                    title: 'Создание тестов',
+                    description: 'Добавление тестов по различным предметам',
                   ),
                   _FeatureItem(
                     icon: Icons.shuffle,
-                    title: 'Variant tuzish',
-                    description: '30 ta random testdan variant yaratish',
+                    title: 'Составление вариантов',
+                    description: 'Создание вариантов из 30 случайных тестов',
                   ),
                   _FeatureItem(
                     icon: Icons.picture_as_pdf,
-                    title: 'PDF yaratish',
-                    description: 'Variantlarni PDF formatida saqlash',
+                    title: 'Создание PDF',
+                    description: 'Сохранение вариантов в формате PDF',
                   ),
                   _FeatureItem(
                     icon: Icons.offline_bolt,
-                    title: 'Offline ishlash',
-                    description: 'Internet aloqasisiz to‘liq ishlaydi',
+                    title: 'Офлайн работа',
+                    description: 'Полностью работает без интернет-соединения',
                   ),
                   _FeatureItem(
                     icon: Icons.security,
-                    title: 'Xavfsizlik',
-                    description: 'Ma’lumotlar qurilmada xavfsiz saqlanadi',
+                    title: 'Безопасность',
+                    description: 'Данные безопасно сохраняются на устройстве',
                   ),
                 ],
               ),
@@ -90,14 +90,14 @@ class AboutPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Texnik ma’lumotlar',
+                    'Техническая информация',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  _InfoRow(label: 'Platforma:', value: 'Flutter'),
-                  _InfoRow(label: 'Versiya:', value: '1.0.0'),
-                  _InfoRow(label: 'Ma’lumotlar bazasi:', value: 'Hive (Local)'),
-                  _InfoRow(label: 'PDF yaratish:', value: 'pdf package'),
+                  _InfoRow(label: 'Платформа:', value: 'Flutter'),
+                  _InfoRow(label: 'Версия:', value: '1.0.0'),
+                  _InfoRow(label: 'База данных:', value: 'Hive (Local)'),
+                  _InfoRow(label: 'Создание PDF:', value: 'pdf package'),
                 ],
               ),
             ),
@@ -110,12 +110,12 @@ class AboutPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    'Litsenziya',
+                    'Лицензия',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Ilova bepul va ochiq manbali. Shaxsiy va ta’lim maqsadlarida erkin foydalanishingiz mumkin.',
+                    'Приложение бесплатное и с открытым исходным кодом. Вы можете свободно использовать его для личных и образовательных целей.',
                     style: TextStyle(fontSize: 15, height: 1.5),
                   ),
                 ],
@@ -135,7 +135,7 @@ class AboutPage extends StatelessWidget {
                 Icon(Icons.favorite, color: Colors.red, size: 32),
                 SizedBox(height: 8),
                 Text(
-                  'Rahmat!',
+                  'Спасибо!',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -144,7 +144,7 @@ class AboutPage extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Ilovamizdan foydalanganingiz uchun tashakkur! Fikr va takliflaringizni kutamiz.',
+                  'Спасибо за использование нашего приложения! Ждем ваших отзывов и предложений.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14),
                 ),

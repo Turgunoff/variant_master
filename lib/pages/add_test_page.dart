@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../models/test_model.dart';
+import '../database/database_helper.dart';
 
 class AddTestPage extends StatefulWidget {
   const AddTestPage({super.key});
@@ -16,21 +16,22 @@ class _AddTestPageState extends State<AddTestPage> {
   final _answerBController = TextEditingController();
   final _answerCController = TextEditingController();
   final _answerDController = TextEditingController();
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
-  String _selectedSubject = 'Matematika';
+  String _selectedSubject = 'Математика';
   int _correctAnswerIndex = 0;
 
   final List<String> _subjects = [
-    'Matematika',
-    'Fizika',
-    'Kimyo',
-    'Biologiya',
-    'Tarix',
-    'Geografiya',
-    'Adabiyot',
-    'Ingliz tili',
-    'Rus tili',
-    'Informatika',
+    'Математика',
+    'Физика',
+    'Химия',
+    'Биология',
+    'История',
+    'География',
+    'Литература',
+    'Английский язык',
+    'Русский язык',
+    'Информатика',
   ];
 
   @override
@@ -55,28 +56,39 @@ class _AddTestPageState extends State<AddTestPage> {
         ],
         correctIndex: _correctAnswerIndex,
         subject: _selectedSubject,
+        createdAt: DateTime.now(),
       );
 
-      final box = Hive.box<TestModel>('tests');
-      await box.add(test);
+      try {
+        await _dbHelper.insertTest(test.toMap());
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Test muvaffaqiyatli saqlandi!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Тест успешно сохранен!'),
+              backgroundColor: Colors.green,
+            ),
+          );
 
-        // Formani tozalash
-        _questionController.clear();
-        _answerAController.clear();
-        _answerBController.clear();
-        _answerCController.clear();
-        _answerDController.clear();
-        setState(() {
-          _correctAnswerIndex = 0;
-        });
+          // Очистить форму
+          _questionController.clear();
+          _answerAController.clear();
+          _answerBController.clear();
+          _answerCController.clear();
+          _answerDController.clear();
+          setState(() {
+            _correctAnswerIndex = 0;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ошибка сохранения: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
@@ -91,7 +103,7 @@ class _AddTestPageState extends State<AddTestPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Yo'nalish tanlash
+              // Выбор предмета
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -99,7 +111,7 @@ class _AddTestPageState extends State<AddTestPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Yo\'nalish:',
+                        'Предмет:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -134,7 +146,7 @@ class _AddTestPageState extends State<AddTestPage> {
 
               const SizedBox(height: 16),
 
-              // Savol matni
+              // Текст вопроса
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -142,7 +154,7 @@ class _AddTestPageState extends State<AddTestPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Savol matni:',
+                        'Текст вопроса:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -153,12 +165,12 @@ class _AddTestPageState extends State<AddTestPage> {
                         controller: _questionController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          hintText: 'Savolni kiriting...',
+                          hintText: 'Введите вопрос...',
                         ),
                         maxLines: 3,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Savol matni kiritilishi shart';
+                            return 'Текст вопроса обязателен';
                           }
                           return null;
                         },
@@ -170,7 +182,7 @@ class _AddTestPageState extends State<AddTestPage> {
 
               const SizedBox(height: 16),
 
-              // Javoblar
+              // Ответы
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -178,7 +190,7 @@ class _AddTestPageState extends State<AddTestPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Javob variantlari:',
+                        'Варианты ответов:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -186,7 +198,7 @@ class _AddTestPageState extends State<AddTestPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // A javob
+                      // Ответ A
                       Row(
                         children: [
                           Radio<int>(
@@ -208,11 +220,11 @@ class _AddTestPageState extends State<AddTestPage> {
                               controller: _answerAController,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'A variantini kiriting...',
+                                hintText: 'Введите вариант A...',
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return 'A variant kiritilishi shart';
+                                  return 'Вариант A обязателен';
                                 }
                                 return null;
                               },
@@ -223,7 +235,7 @@ class _AddTestPageState extends State<AddTestPage> {
 
                       const SizedBox(height: 12),
 
-                      // B javob
+                      // Ответ B
                       Row(
                         children: [
                           Radio<int>(
@@ -245,11 +257,11 @@ class _AddTestPageState extends State<AddTestPage> {
                               controller: _answerBController,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'B variantini kiriting...',
+                                hintText: 'Введите вариант B...',
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return 'B variant kiritilishi shart';
+                                  return 'Вариант B обязателен';
                                 }
                                 return null;
                               },
@@ -260,7 +272,7 @@ class _AddTestPageState extends State<AddTestPage> {
 
                       const SizedBox(height: 12),
 
-                      // C javob
+                      // Ответ C
                       Row(
                         children: [
                           Radio<int>(
@@ -282,11 +294,11 @@ class _AddTestPageState extends State<AddTestPage> {
                               controller: _answerCController,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'C variantini kiriting...',
+                                hintText: 'Введите вариант C...',
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return 'C variant kiritilishi shart';
+                                  return 'Вариант C обязателен';
                                 }
                                 return null;
                               },
@@ -297,7 +309,7 @@ class _AddTestPageState extends State<AddTestPage> {
 
                       const SizedBox(height: 12),
 
-                      // D javob
+                      // Ответ D
                       Row(
                         children: [
                           Radio<int>(
@@ -319,11 +331,11 @@ class _AddTestPageState extends State<AddTestPage> {
                               controller: _answerDController,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'D variantini kiriting...',
+                                hintText: 'Введите вариант D...',
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return 'D variant kiritilishi shart';
+                                  return 'Вариант D обязателен';
                                 }
                                 return null;
                               },
@@ -349,7 +361,7 @@ class _AddTestPageState extends State<AddTestPage> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'To\'g\'ri javob: ${String.fromCharCode(65 + _correctAnswerIndex)}',
+                                'Правильный ответ: ${String.fromCharCode(65 + _correctAnswerIndex)}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.blue,
@@ -366,7 +378,7 @@ class _AddTestPageState extends State<AddTestPage> {
 
               const SizedBox(height: 24),
 
-              // Saqlash tugmasi
+              // Кнопка сохранения
               ElevatedButton(
                 onPressed: _saveTest,
                 style: ElevatedButton.styleFrom(
@@ -378,7 +390,7 @@ class _AddTestPageState extends State<AddTestPage> {
                   ),
                 ),
                 child: const Text(
-                  'Testni saqlash',
+                  'Сохранить тест',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

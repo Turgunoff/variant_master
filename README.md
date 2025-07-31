@@ -1,59 +1,59 @@
 # Variant Master
 
-Variant Master — bu o‘qituvchilar va talabalar uchun offline test va variant yaratish ilovasi. Ilova yordamida siz testlar qo‘shishingiz, 30 ta random testdan variant tuzishingiz va PDF formatida saqlashingiz mumkin. Barcha ma’lumotlar qurilmada lokal saqlanadi, internet talab qilinmaydi.
+Variant Master — это приложение для создания офлайн тестов и вариантов для учителей и студентов. С помощью приложения вы можете добавлять тесты, составлять варианты из 30 случайных тестов и сохранять их в формате PDF. Все данные сохраняются локально на устройстве, интернет не требуется.
 
-## 📱 Asosiy xususiyatlar
+## 📱 Основные возможности
 
-- Foydalanuvchi hisobisiz va offline ishlaydi
-- Testlar qo‘shish va tahrirlash
-- Yo‘nalish (fan) bo‘yicha testlarni ajratish
-- 30 ta random testdan variant yaratish
-- Variantlarni PDF ko‘rinishda saqlash va baham ko‘rish
-- Saqlangan variantlar ro‘yxati
-- Dark/Light mode va shrift o‘lchamini boshqarish
-- Drawer menyu asosida qulay navigatsiya
-- Barcha matnlar o‘zbek tilida
+- Работает без учетной записи пользователя и офлайн
+- Добавление и редактирование тестов
+- Разделение тестов по предметам
+- Создание вариантов из 30 случайных тестов
+- Сохранение и отправка вариантов в формате PDF
+- Список сохраненных вариантов
+- Управление темным/светлым режимом и размером шрифта
+- Удобная навигация на основе drawer меню
+- Все тексты на русском языке
 
-## 🚀 Boshlash
+## 🚀 Начало работы
 
-### 1. Klonni yuklab oling
+### 1. Клонируйте репозиторий
 
 ```sh
 git clone https://github.com/yourusername/variant_master.git
 cd variant_master
 ```
 
-### 2. Paketlarni o‘rnating
+### 2. Установите пакеты
 
 ```sh
 flutter pub get
 ```
 
-### 3. Hive adapterlarini generatsiya qiling
+### 3. Сгенерируйте Hive адаптеры
 
 ```sh
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
-### 4. Android/iOS uchun build
+### 4. Сборка для Android/iOS
 
 ```sh
 flutter run
 ```
 
-### 5. Demo testlarni avtomatik yuklash
+### 5. Автоматическая загрузка демо тестов
 
-Ilova birinchi ishga tushganda har bir fan uchun 50 tadan demo test avtomatik yuklanadi.
+При первом запуске приложения для каждого предмета автоматически загружается по 50 демо тестов.
 
-## ⚙️ Texnik ma’lumotlar
+## ⚙️ Техническая информация
 
-- **Platforma:** Flutter
-- **Lokal baza:** Hive
+- **Платформа:** Flutter
+- **Локальная база:** Hive
 - **PDF:** pdf, printing package
-- **Ikonkalar:** iconsax
-- **State management:** setState (oddiy ilova uchun)
+- **Иконки:** iconsax
+- **Управление состоянием:** setState (для простого приложения)
 
-## 📂 Papka tuzilmasi
+## 📂 Структура папок
 
 ```
 lib/
@@ -70,39 +70,39 @@ lib/
     about_page.dart
 ```
 
-## 📝 Foydalanish
+## 📝 Использование
 
-- Drawer menyudan kerakli bo‘limni tanlang
-- Yangi test qo‘shing va yo‘nalishini belgilang
-- Variant yaratish bo‘limida fan tanlab, 30 ta random testdan PDF variant yarating
-- Saqlangan variantlarni ko‘ring va PDF faylni yuklab oling yoki baham ko‘ring
+- Выберите нужный раздел из drawer меню
+- Добавьте новый тест и укажите предмет
+- В разделе создания вариантов выберите предмет и создайте PDF вариант из 30 случайных тестов
+- Просматривайте сохраненные варианты и скачивайте или отправляйте PDF файлы
 
-## 🛠️ Dasturchilar uchun
+## 🛠️ Для разработчиков
 
-- Kodlar toza va izohlangan
-- Har bir sahifa uchun alohida widget
-- Model va local storage Hive orqali
-- Demo testlar uchun `main.dart`da `insertDemoTests()` funksiyasi mavjud
+- Код чистый и прокомментированный
+- Отдельный widget для каждой страницы
+- Модели и локальное хранилище через Hive
+- Для демо тестов есть функция `insertDemoTests()` в `main.dart`
 
-## 📸 Screenshotlar
+## 📸 Скриншоты
 
 <table>
   <tr>
-    <td align="center"><img src="screenshots/home.png" alt="Bosh sahifa" width="350" /><br>Bosh sahifa</td>
-    <td align="center"><img src="screenshots/add_test.png" alt="Yangi test qo‘shish" width="350" /><br>Yangi test qo‘shish</td>
-    <td align="center"><img src="screenshots/tests.png" alt="Testlar ro‘yxati" width="350" /><br>Testlar ro‘yxati</td>
+    <td align="center"><img src="screenshots/home.png" alt="Главная страница" width="350" /><br>Главная страница</td>
+    <td align="center"><img src="screenshots/add_test.png" alt="Добавить новый тест" width="350" /><br>Добавить новый тест</td>
+    <td align="center"><img src="screenshots/tests.png" alt="Список тестов" width="350" /><br>Список тестов</td>
   </tr>
   <tr>
-    <td align="center"><img src="screenshots/create_variant.png" alt="Variant yaratish" width="350" /><br>Variant yaratish</td>
-    <td align="center"><img src="screenshots/save_variant.png" alt="Variantni saqlash" width="350" /><br>Variantni saqlash</td>
-    <td align="center"><img src="screenshots/about.png" alt="Ilova haqida" width="350" /><br>Ilova haqida</td>
+    <td align="center"><img src="screenshots/create_variant.png" alt="Создание варианта" width="350" /><br>Создание варианта</td>
+    <td align="center"><img src="screenshots/save_variant.png" alt="Сохранение варианта" width="350" /><br>Сохранение варианта</td>
+    <td align="center"><img src="screenshots/about.png" alt="О приложении" width="350" /><br>О приложении</td>
   </tr>
 </table>
 
-## 👨‍💻 Muallif va hissa qo‘shuvchilar
+## 👨‍💻 Автор и участники
 
 - Eldor Turgunov
 
-## 📄 Litsenziya
+## 📄 Лицензия
 
 MIT

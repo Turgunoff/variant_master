@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import '../models/test_model.dart';
-import '../models/variant_model.dart';
-import 'dart:io';
-import '../main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -15,6 +11,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false;
   double _fontSize = 16;
+  SharedPreferences? _prefs;
 
   @override
   void initState() {
@@ -23,24 +20,24 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadSettings() async {
-    final box = await Hive.openBox('settings');
+    _prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isDarkMode = box.get('isDarkMode', defaultValue: false);
-      _fontSize = box.get('fontSize', defaultValue: 16.0);
+      _isDarkMode = _prefs?.getBool('isDarkMode') ?? false;
+      _fontSize = _prefs?.getDouble('fontSize') ?? 16.0;
     });
   }
 
   void _onThemeChanged(bool value) {
     setState(() {
       _isDarkMode = value;
-      Hive.box('settings').put('isDarkMode', value);
+      _prefs?.setBool('isDarkMode', value);
     });
   }
 
   void _onFontSizeChanged(double value) {
     setState(() {
       _fontSize = value;
-      Hive.box('settings').put('fontSize', value);
+      _prefs?.setDouble('fontSize', value);
     });
   }
 
@@ -51,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(24),
         children: [
           const Text(
-            'Sozlamalar',
+            'Настройки',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
@@ -62,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Tungi rejim (Dark mode)',
+                    'Темный режим (Dark mode)',
                     style: TextStyle(fontSize: 16),
                   ),
                   Switch(value: _isDarkMode, onChanged: _onThemeChanged),
@@ -77,10 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Shrift o\'lchami',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  const Text('Размер шрифта', style: TextStyle(fontSize: 16)),
                   Slider(
                     value: _fontSize,
                     min: 12,
@@ -92,9 +86,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Kichik'),
+                      const Text('Маленький'),
                       Text('${_fontSize.toStringAsFixed(0)} px'),
-                      const Text('Katta'),
+                      const Text('Большой'),
                     ],
                   ),
                 ],

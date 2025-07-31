@@ -1,24 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../models/test_model.dart';
 import '../models/variant_model.dart';
+import '../database/database_helper.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final testBox = Hive.box<TestModel>('tests');
-    final variantBox = Hive.box<VariantModel>('variants');
-    final tests = testBox.values.toList();
-    final variants = variantBox.values.toList();
-    final subjects = tests.map((e) => e.subject).toSet();
+  State<HomePage> createState() => _HomePageState();
+}
 
-    // Eng ko'p testli fan
+class _HomePageState extends State<HomePage> {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  List<TestModel> _tests = [];
+  List<VariantModel> _variants = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Загружаем тесты
+      final testMaps = await _dbHelper.getAllTests();
+      _tests = testMaps.map((map) => TestModel.fromMap(map)).toList();
+
+      // Загружаем варианты
+      final variantMaps = await _dbHelper.getAllVariants();
+      _variants = variantMaps.map((map) => VariantModel.fromMap(map)).toList();
+
+      // Загружаем testIds для каждого варианта
+      for (int i = 0; i < _variants.length; i++) {
+        final testMapsForVariant = await _dbHelper.getTestsForVariant(
+          _variants[i].id!,
+        );
+        final testIds = testMapsForVariant
+            .map((map) => map['id'] as int)
+            .toList();
+        _variants[i] = _variants[i].copyWith(testIds: testIds);
+      }
+    } catch (e) {
+      print('Ошибка загрузки данных: $e');
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final subjects = _tests.map((e) => e.subject).toSet();
+
+    // Предмет с наибольшим количеством тестов
     String? mostPopularSubject;
-    if (tests.isNotEmpty) {
+    if (_tests.isNotEmpty) {
       final subjectCounts = <String, int>{};
-      for (var t in tests) {
+      for (var t in _tests) {
         subjectCounts[t.subject] = (subjectCounts[t.subject] ?? 0) + 1;
       }
       mostPopularSubject = subjectCounts.entries
@@ -26,117 +71,106 @@ class HomePage extends StatelessWidget {
           .key;
     }
 
-    // Oxirgi test va variant
-    final lastTest = tests.isNotEmpty ? tests.last : null;
-    final lastVariant = variants.isNotEmpty ? variants.last : null;
+    // Последний тест и вариант
+    final lastTest = _tests.isNotEmpty ? _tests.first : null;
+    final lastVariant = _variants.isNotEmpty ? _variants.first : null;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Column(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               children: [
-                Image.asset(
-                  'assets/logo/logo.png',
-                  width: 150,
-                  height: 150,
-                  fit: BoxFit.contain,
+                _StatCard(
+                  icon: Icons.quiz,
+                  label: 'Всего тестов',
+                  value: _tests.length.toString(),
+                  color: Colors.blue,
                 ),
-                const Text(
-                  'Offline test va variantlar ilovasi',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                const SizedBox(height: 12),
+                _StatCard(
+                  icon: Icons.picture_as_pdf,
+                  label: 'Всего вариантов',
+                  value: _variants.length.toString(),
+                  color: Colors.green,
                 ),
+                const SizedBox(height: 12),
+                _StatCard(
+                  icon: Icons.category,
+                  label: 'Всего предметов',
+                  value: subjects.length.toString(),
+                  color: Colors.orange,
+                ),
+                if (mostPopularSubject != null) ...[
+                  const SizedBox(height: 12),
+                  _StatCard(
+                    icon: Icons.star,
+                    label: 'Самый популярный предмет',
+                    value: mostPopularSubject,
+                    color: Colors.purple,
+                  ),
+                ],
               ],
             ),
-          ),
-          const SizedBox(height: 24),
-          GridView.count(
-            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.2,
-            children: [
-              _StatCard(
-                icon: Icons.quiz,
-                label: 'Jami testlar',
-                value: tests.length.toString(),
-                color: Colors.blue,
-              ),
-              _StatCard(
-                icon: Icons.picture_as_pdf,
-                label: 'Jami variantlar',
-                value: variants.length.toString(),
-                color: Colors.green,
-              ),
-              _StatCard(
-                icon: Icons.category,
-                label: 'Jami fanlar',
-                value: subjects.length.toString(),
-                color: Colors.orange,
-              ),
-              if (mostPopularSubject != null)
-                _StatCard(
-                  icon: Icons.star,
-                  label: 'Eng ko\'p testli fan',
-                  value: mostPopularSubject,
-                  color: Colors.purple,
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          if (lastTest != null) ...[
-            const Text(
-              'Oxirgi qo\'shilgan test',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              child: ListTile(
-                leading: const Icon(Icons.quiz, color: Colors.blue),
-                title: Text(
-                  lastTest.question,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Text('Fan: ${lastTest.subject}'),
+            if (lastTest != null) ...[
+              const Text(
+                'Последний добавленный тест',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
-          if (lastVariant != null) ...[
-            const Text(
-              'Oxirgi yaratilgan variant',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              child: ListTile(
-                leading: const Icon(Icons.picture_as_pdf, color: Colors.green),
-                title: Text('Fan: ${lastVariant.subject}'),
-                subtitle: Text(
-                  'Sana: ${lastVariant.createdAt.day}.${lastVariant.createdAt.month}.${lastVariant.createdAt.year}',
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: const Icon(Icons.quiz, color: Colors.blue),
+                  title: Text(
+                    lastTest.question,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text('Предмет: ${lastTest.subject}'),
                 ),
               ),
+            ],
+            if (lastVariant != null) ...[
+              const Text(
+                'Последний созданный вариант',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.picture_as_pdf,
+                    color: Colors.green,
+                  ),
+                  title: Text('Предмет: ${lastVariant.subject}'),
+                  subtitle: Text(
+                    'Дата: ${lastVariant.createdAt.day}.${lastVariant.createdAt.month}.${lastVariant.createdAt.year}',
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+            const Text(
+              'Кратко о приложении',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '''• Все данные сохраняются локально и работают офлайн.
+• Для создания варианта нужно минимум 30 тестов.
+• Можно скачивать PDF файлы и делиться ими.
+• Приложение бесплатное и без рекламы.''',
+              style: TextStyle(fontSize: 15, color: Colors.grey),
             ),
           ],
-          const SizedBox(height: 24),
-          const Text(
-            'Ilova haqida qisqacha',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '''• Barcha ma'lumotlar lokal saqlanadi va offline ishlaydi.
-• Variant yaratish uchun kamida 30 ta test kerak.
-• PDF fayllarni yuklab olish va baham ko'rish mumkin.
-• Ilova bepul va reklamasiz.''',
-            style: TextStyle(fontSize: 15, color: Colors.grey),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -155,29 +189,47 @@ class _StatCard extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
-        width: 130,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 4),
-            Text(label, style: const TextStyle(fontSize: 13)),
-          ],
-        ),
+            child: Icon(icon, size: 24, color: color),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:variant_master/pages/tests_list_page.dart';
 import 'models/test_model.dart';
 import 'models/variant_model.dart';
@@ -9,14 +8,14 @@ import 'pages/saved_variants_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/about_page.dart';
 import 'pages/home_page.dart';
+import 'database/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(TestModelAdapter());
-  Hive.registerAdapter(VariantModelAdapter());
-  await Hive.openBox<TestModel>('tests');
-  await Hive.openBox<VariantModel>('variants');
+
+  // Инициализация базы данных
+  await DatabaseHelper().database;
+
   runApp(const MyApp());
 }
 
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Variant Master',
       theme: ThemeData(
-        brightness: Brightness.light, // Dark mode
+        brightness: Brightness.light,
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
@@ -65,27 +64,49 @@ class _AppState extends State<App> {
   ];
 
   final List<String> _titles = [
-    "Bosh sahifa",
-    "Yangi test qo'shish",
-    "Testlar ro'yxati",
-    "Variant yaratish",
-    "Saqlangan variantlar",
-    "Sozlamalar",
-    "Ilova haqida (Variant Master)",
+    "Главная страница",
+    "Добавить новый тест",
+    "Список тестов",
+    "Создать вариант",
+    "Сохраненные варианты",
+    "Настройки",
+    "О приложении (Variant Master)",
   ];
 
   void _onDrawerItemTap(int index) {
     setState(() {
       _selectedIndex = index;
-      Navigator.pop(context); // Drawer'ni yopish
+      Navigator.pop(context);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_selectedIndex])),
-      drawer: Drawer(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: _selectedIndex == 0
+            ? Image.asset(
+                'assets/logo/logo.png',
+                height: 40,
+                fit: BoxFit.contain,
+              )
+            : Text(_titles[_selectedIndex]),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        centerTitle: _selectedIndex == 0 ? false : true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              Scaffold.of(context).openEndDrawer();
+            },
+          ),
+        ],
+      ),
+      endDrawer: Drawer(
+        backgroundColor: Colors.white,
         child: ListView(
           children: [
             DrawerHeader(
@@ -102,37 +123,37 @@ class _AppState extends State<App> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text("Bosh sahifa"),
+              title: const Text("Главная страница"),
               onTap: () => _onDrawerItemTap(0),
             ),
             ListTile(
               leading: const Icon(Icons.add),
-              title: const Text("Yangi test qo'shish"),
+              title: const Text("Добавить новый тест"),
               onTap: () => _onDrawerItemTap(1),
             ),
             ListTile(
               leading: const Icon(Icons.list),
-              title: const Text("Testlar ro'yxati"),
+              title: const Text("Список тестов"),
               onTap: () => _onDrawerItemTap(2),
             ),
             ListTile(
               leading: const Icon(Icons.shuffle),
-              title: const Text("Variant yaratish"),
+              title: const Text("Создать вариант"),
               onTap: () => _onDrawerItemTap(3),
             ),
             ListTile(
               leading: const Icon(Icons.picture_as_pdf),
-              title: const Text("Saqlangan variantlar"),
+              title: const Text("Сохраненные варианты"),
               onTap: () => _onDrawerItemTap(4),
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text("Sozlamalar"),
+              title: const Text("Настройки"),
               onTap: () => _onDrawerItemTap(5),
             ),
             ListTile(
               leading: const Icon(Icons.info),
-              title: const Text("Ilova haqida"),
+              title: const Text("О приложении"),
               onTap: () => _onDrawerItemTap(6),
             ),
           ],
