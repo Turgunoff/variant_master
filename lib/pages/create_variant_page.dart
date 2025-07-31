@@ -220,17 +220,17 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                 },
                 child: const Text('Печать'),
               ),
-                             TextButton(
-                 onPressed: () async {
-                   Navigator.pop(context);
-                   final bytes = await pdf.save();
-                   Printing.sharePdf(
-                     bytes: bytes,
-                     filename: 'variant_${_selectedSubject}_$timestamp.pdf',
-                   );
-                 },
-                 child: const Text('Поделиться'),
-               ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final bytes = await pdf.save();
+                  Printing.sharePdf(
+                    bytes: bytes,
+                    filename: 'variant_${_selectedSubject}_$timestamp.pdf',
+                  );
+                },
+                child: const Text('Поделиться'),
+              ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Закрыть'),
@@ -254,48 +254,102 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Выбор предмета
-            Card(
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200, width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Выберите предмет:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.school,
+                            color: Colors.blue,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Выберите предмет',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      value: _selectedSubject,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
                       ),
-                      hint: const Text('Выберите предмет'),
-                      items: _subjects.map((subject) {
-                        return DropdownMenuItem(
-                          value: subject,
-                          child: Text(subject),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedSubject = value;
-                          _selectedTests = null;
-                        });
-                      },
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedSubject,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          suffixIcon: Container(
+                            margin: const EdgeInsets.only(right: 6),
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey.shade600,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                        icon: const SizedBox.shrink(),
+                        dropdownColor: Colors.white,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        hint: const Text('Выберите предмет'),
+                        items: _subjects.map((subject) {
+                          return DropdownMenuItem(
+                            value: subject,
+                            child: Text(subject),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedSubject = value;
+                            _selectedTests = null;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -310,8 +364,23 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                 future: _getTestsBySubject(_selectedSubject!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Card(
-                      child: Padding(
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.shade200,
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Padding(
                         padding: EdgeInsets.all(16),
                         child: Center(child: CircularProgressIndicator()),
                       ),
@@ -319,12 +388,51 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Card(
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.red.shade200,
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Ошибка загрузки: ${snapshot.error}',
-                          style: const TextStyle(color: Colors.red),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Ошибка загрузки: ${snapshot.error}',
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -333,53 +441,135 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
                   final tests = snapshot.data ?? [];
                   final hasEnoughTests = tests.length >= 30;
 
-                  return Card(
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: hasEnoughTests
+                            ? Colors.green.shade200
+                            : Colors.orange.shade200,
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (hasEnoughTests ? Colors.green : Colors.orange)
+                              .withOpacity(0.1),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Информация о предмете: $_selectedSubject',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(
-                                hasEnoughTests
-                                    ? Icons.check_circle
-                                    : Icons.warning,
-                                color: hasEnoughTests
-                                    ? Colors.green
-                                    : Colors.orange,
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color:
+                                      (hasEnoughTests
+                                              ? Colors.green
+                                              : Colors.orange)
+                                          .withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  hasEnoughTests
+                                      ? Icons.check_circle
+                                      : Icons.warning,
+                                  color: hasEnoughTests
+                                      ? Colors.green
+                                      : Colors.orange,
+                                  size: 16,
+                                ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 10),
                               Expanded(
-                                child: Text(
-                                  'Количество тестов: ${tests.length}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: hasEnoughTests
-                                        ? Colors.green
-                                        : Colors.orange,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Информация о предмете',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: hasEnoughTests
+                                            ? Colors.green
+                                            : Colors.orange,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _selectedSubject!,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            hasEnoughTests
-                                ? '✓ Достаточно тестов для создания варианта'
-                                : '⚠ Нужно минимум 30 тестов для создания варианта',
-                            style: TextStyle(
-                              color: hasEnoughTests
-                                  ? Colors.green
-                                  : Colors.orange,
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color:
+                                  (hasEnoughTests
+                                          ? Colors.green
+                                          : Colors.orange)
+                                      .withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  hasEnoughTests
+                                      ? Icons.check_circle
+                                      : Icons.warning,
+                                  color: hasEnoughTests
+                                      ? Colors.green
+                                      : Colors.orange,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Количество тестов: ${tests.length}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: hasEnoughTests
+                                              ? Colors.green
+                                              : Colors.orange,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        hasEnoughTests
+                                            ? '✓ Достаточно тестов для создания варианта'
+                                            : '⚠ Нужно минимум 30 тестов для создания варианта',
+                                        style: TextStyle(
+                                          color: hasEnoughTests
+                                              ? Colors.green
+                                              : Colors.orange,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -392,98 +582,225 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
             const SizedBox(height: 24),
 
             // Кнопка создания варианта
-            ElevatedButton(
-              onPressed: _isGenerating || _selectedSubject == null
-                  ? null
-                  : _generateVariant,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              child: _isGenerating
-                  ? const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+              child: ElevatedButton(
+                onPressed: _isGenerating || _selectedSubject == null
+                    ? null
+                    : _generateVariant,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isGenerating
+                    ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Text('Создание варианта...'),
-                      ],
-                    )
-                  : const Text(
-                      'Создать вариант',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                          SizedBox(width: 10),
+                          Text(
+                            'Создание варианта...',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_circle, size: 18),
+                          SizedBox(width: 6),
+                          Text(
+                            'Создать вариант',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+              ),
             ),
 
             const SizedBox(height: 24),
 
             // Информация о созданном варианте
             if (_selectedTests != null) ...[
-              Card(
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.shade200, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.1),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Созданный вариант:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.picture_as_pdf,
+                              color: Colors.green,
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Созданный вариант',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
-                      Text('Предмет: $_selectedSubject'),
-                      Text('Количество вопросов: ${_selectedTests!.length}'),
-                      Text(
-                        'Дата создания: ${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}',
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildInfoRow('Предмет', _selectedSubject!),
+                            const SizedBox(height: 6),
+                            _buildInfoRow(
+                              'Количество вопросов',
+                              '${_selectedTests!.length}',
+                            ),
+                            const SizedBox(height: 6),
+                            _buildInfoRow(
+                              'Дата создания',
+                              '${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}',
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
             ],
 
-            const SizedBox(height: 24),
-
             // Инструкции
-            Card(
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200, width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Как создать вариант:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.help_outline,
+                            color: Colors.purple,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Как создать вариант',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      '1. Выберите предмет из списка\n'
-                      '2. Убедитесь, что у вас есть минимум 30 тестов\n'
-                      '3. Нажмите "Создать вариант"\n'
-                      '4. Дождитесь создания PDF файла\n'
-                      '5. Выберите действие: печать или поделиться',
-                      style: TextStyle(fontSize: 14),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildInstructionStep(
+                            '1',
+                            'Выберите предмет из списка',
+                          ),
+                          _buildInstructionStep(
+                            '2',
+                            'Убедитесь, что у вас есть минимум 30 тестов',
+                          ),
+                          _buildInstructionStep(
+                            '3',
+                            'Нажмите "Создать вариант"',
+                          ),
+                          _buildInstructionStep(
+                            '4',
+                            'Дождитесь создания PDF файла',
+                          ),
+                          _buildInstructionStep(
+                            '5',
+                            'Выберите действие: печать или поделиться',
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -491,6 +808,63 @@ class _CreateVariantPageState extends State<CreateVariantPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      children: [
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.green,
+            fontSize: 13,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(color: Colors.black87, fontSize: 13),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInstructionStep(String number, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.purple,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13, color: Colors.black87),
+            ),
+          ),
+        ],
       ),
     );
   }
